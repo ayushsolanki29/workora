@@ -39,7 +39,7 @@ export async function setCookies(accessToken, refreshToken) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60, // 1 hour
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   });
 
   // Set Refresh Token cookie (7 days)

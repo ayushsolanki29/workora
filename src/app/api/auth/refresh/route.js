@@ -33,7 +33,7 @@ export async function POST() {
       userId: session.user.id,
       hasOrg: !!session.user.organizationId,
       organizationId: session.user.organizationId || null
-    }, '15m');
+    }, '7d');
     
     // We optionally can rotate the refresh token here, but for now we just reuse the valid one
     // until it expires (7 days).

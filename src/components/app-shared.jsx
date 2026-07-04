@@ -41,11 +41,7 @@ export const navGroups = [
 	{
 		label: "Financials",
 		items: [
-			{
-				title: "Estimates",
-				path: "#/estimates",
-				icon: <FileTextIcon />,
-			},
+
 			{
 				title: "Invoices",
 				path: "#/invoices",

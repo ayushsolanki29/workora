@@ -63,7 +63,6 @@ export function AppSidebar() {
 							<DropdownMenuContent align="start" className="w-56">
 								<DropdownMenuItem>New Client</DropdownMenuItem>
 								<DropdownMenuItem>New Project</DropdownMenuItem>
-								<DropdownMenuItem>New Estimate</DropdownMenuItem>
 								<DropdownMenuItem>New Invoice</DropdownMenuItem>
 								<DropdownMenuItem>Record Payment</DropdownMenuItem>
 							</DropdownMenuContent>

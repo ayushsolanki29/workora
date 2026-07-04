@@ -2,7 +2,6 @@ import { DashboardStats } from "@/components/stats";
 import { RevenueOverviewChart } from "@/components/conversation-volume-chart";
 import { InvoiceStatusChart } from "@/components/channel-breakdown-chart";
 import { ProjectStatusChart } from "@/components/csat-responses-chart";
-import { BusinessHealth } from "@/components/first-reply-time-chart";
 import { DashboardDataTable } from "@/components/dashboard-data-table";
 import { DashboardListWidget } from "@/components/dashboard-list-widget";
 import { Badge } from "@/components/ui/badge";
@@ -45,18 +44,6 @@ const projectsData = [
     { name: "Website Redesign", client: "Acme Studio", budget: "₹1,50,000", dueDate: "Aug 15, 2026", status: "In Progress" },
     { name: "Mobile App MVP", client: "Bright Labs", budget: "₹3,20,000", dueDate: "Sep 01, 2026", status: "Planning" },
     { name: "Brand Guidelines", client: "NovaTech", budget: "₹45,000", dueDate: "Jul 20, 2026", status: "Review" },
-];
-
-const estimatesColumns = [
-    { header: "Estimate", accessor: "id" },
-    { header: "Client", accessor: "client" },
-    { header: "Amount", accessor: "amount" },
-    { header: "Valid Until", accessor: "validUntil" },
-    { header: "Status", render: (row) => <Badge variant={row.status === "Approved" ? "default" : "secondary"}>{row.status}</Badge> }
-];
-const estimatesData = [
-    { id: "EST-0042", client: "Apex Digital", amount: "₹65,000", validUntil: "Jul 10, 2026", status: "Sent" },
-    { id: "EST-0041", client: "PixelCraft", amount: "₹1,20,000", validUntil: "Jul 05, 2026", status: "Approved" },
 ];
 
 const invoicesColumns = [
@@ -102,7 +89,6 @@ const upcomingDeadlines = [
 const quickActions = [
     { id: 1, title: "Add Client", icon: <UserPlusIcon />, action: <PlusIcon className="size-4" /> },
     { id: 2, title: "Create Project", icon: <BriefcaseIcon />, action: <PlusIcon className="size-4" /> },
-    { id: 3, title: "Create Estimate", icon: <FileTextIcon />, action: <PlusIcon className="size-4" /> },
     { id: 4, title: "Generate Invoice", icon: <FileTextIcon />, action: <PlusIcon className="size-4" /> },
     { id: 5, title: "Record Payment", icon: <CreditCardIcon />, action: <PlusIcon className="size-4" /> },
     { id: 6, title: "View Reports", icon: <PieChartIcon />, action: <PlusIcon className="size-4" /> },
@@ -143,9 +129,6 @@ export function Dashboard() {
             <div className="flex flex-col gap-4 md:col-span-2 lg:col-span-1">
                 <ProjectStatusChart className="flex-1" />
             </div>
-            <div className="flex flex-col gap-4 md:col-span-2 lg:col-span-1">
-                <BusinessHealth className="flex-1" />
-            </div>
 
             <DashboardDataTable 
                 className="md:col-span-2 lg:col-span-2"
@@ -153,13 +136,6 @@ export function Dashboard() {
                 columns={invoicesColumns} 
                 data={invoicesData} 
                 actionLabel="View all invoices"
-            />
-            <DashboardDataTable 
-                className="md:col-span-2 lg:col-span-2"
-                title="Recent Estimates" 
-                columns={estimatesColumns} 
-                data={estimatesData} 
-                actionLabel="View all estimates"
             />
 
             <DashboardListWidget 

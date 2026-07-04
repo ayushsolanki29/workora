@@ -32,7 +32,7 @@ export async function POST(request) {
       userId: user.id, 
       hasOrg: !!user.organizationId,
       organizationId: user.organizationId || null
-    }, '15m'); // 15 minutes
+    }, '7d'); // 7 days
     
     // Generate secure refresh token string (opaque)
     const refreshToken = crypto.randomBytes(40).toString('hex');
