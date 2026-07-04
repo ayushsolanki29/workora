@@ -18,9 +18,8 @@ export const navGroups = [
 		items: [
 			{
 				title: "Dashboard",
-				path: "#/dashboard",
+				path: "/dashboard",
 				icon: <LayoutGridIcon />,
-				isActive: true,
 			},
 		],
 	},
@@ -29,7 +28,7 @@ export const navGroups = [
 		items: [
 			{
 				title: "Clients",
-				path: "#/clients",
+				path: "/dashboard/clients",
 				icon: <UsersIcon />,
 			},
 			{
@@ -59,26 +58,7 @@ export const navGroups = [
 			},
 		],
 	},
-    {
-		label: "Operations",
-		items: [
-			{
-				title: "Tasks",
-				path: "#/tasks",
-				icon: <CheckSquareIcon />,
-			},
-			{
-				title: "Time Tracking",
-				path: "#/time",
-				icon: <ClockIcon />,
-			},
-			{
-				title: "Reports",
-				path: "#/reports",
-				icon: <PieChartIcon />,
-			},
-		],
-	},
+  
 	{
 		label: "Organization",
 		items: [
@@ -86,10 +66,10 @@ export const navGroups = [
 				title: "Workspace",
 				icon: <SettingsIcon />,
 				subItems: [
-					{ title: "General Settings", path: "#/workspace/settings" },
-					{ title: "Team & Roles", path: "#/workspace/team" },
-					{ title: "Integrations", path: "#/workspace/integrations" },
-					{ title: "Billing", path: "#/workspace/billing" },
+					{ title: "General Settings", path: "/dashboard/workspace/settings" },
+					// { title: "Team & Roles", path: "#/workspace/team" },
+					// { title: "Integrations", path: "#/workspace/integrations" },
+					// { title: "Billing", path: "#/workspace/billing" },
 				],
 			},
 		],

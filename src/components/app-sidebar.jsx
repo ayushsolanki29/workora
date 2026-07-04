@@ -1,3 +1,5 @@
+"use client";
+
 import { LogoIcon } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,26 @@ import { footerNavLinks, navGroups } from "@/components/app-shared";
 import { LatestChange } from "@/components/latest-change";
 import { PlusIcon, SearchIcon } from "lucide-react";
 
+import { usePathname } from "next/navigation";
+
 export function AppSidebar() {
+    const pathname = usePathname();
+
+    const activeNavGroups = navGroups.map(group => ({
+        ...group,
+        items: group.items.map(item => {
+            const isItemActive = item.path === pathname || (item.path !== "/dashboard" && pathname.startsWith(item.path));
+            return {
+                ...item,
+                isActive: isItemActive,
+                subItems: item.subItems?.map(sub => ({
+                    ...sub,
+                    isActive: pathname === sub.path
+                }))
+            };
+        })
+    }));
+
 	return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader className="h-14 justify-center">
@@ -57,7 +78,7 @@ export function AppSidebar() {
 						</Button>
 					</SidebarMenuItem>
 				</SidebarGroup>
-				{navGroups.map((group, index) => (
+				{activeNavGroups.map((group, index) => (
 					<NavGroup key={`sidebar-group-${index}`} {...group} />
 				))}
 			</SidebarContent>

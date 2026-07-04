@@ -47,7 +47,8 @@ export async function POST(request) {
 
     const newAccessToken = await signToken({ 
       userId: user.id, 
-      hasOrg: true 
+      hasOrg: true,
+      organizationId: organization.id
     }, '15m');
 
     // We keep the existing refresh token valid, just overwrite the access token cookie

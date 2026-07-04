@@ -30,7 +30,8 @@ export async function POST(request) {
     // Generate tokens
     const accessToken = await signToken({ 
       userId: user.id, 
-      hasOrg: !!user.organizationId 
+      hasOrg: !!user.organizationId,
+      organizationId: user.organizationId || null
     }, '15m'); // 15 minutes
     
     // Generate secure refresh token string (opaque)

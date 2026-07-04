@@ -22,10 +22,12 @@ function CollapsibleContent({
   ...props
 }) {
   return (
-    <CollapsiblePrimitive.Panel data-slot="collapsible-content" className={cn("t-acc-panel", className)} {...props}>
-      <div className="t-acc-panel-inner">
-        {children}
-      </div>
+    <CollapsiblePrimitive.Panel 
+      data-slot="collapsible-content" 
+      className={cn("overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down", className)} 
+      {...props}
+    >
+      {children}
     </CollapsiblePrimitive.Panel>
   );
 }

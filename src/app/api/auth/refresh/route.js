@@ -31,7 +31,8 @@ export async function POST() {
     // Generate new short-lived access token
     const newAccessToken = await signToken({ 
       userId: session.user.id,
-      hasOrg: !!session.user.organizationId
+      hasOrg: !!session.user.organizationId,
+      organizationId: session.user.organizationId || null
     }, '15m');
     
     // We optionally can rotate the refresh token here, but for now we just reuse the valid one
