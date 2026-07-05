@@ -37,6 +37,7 @@ model Organization {
   masterCurrency String    @default("INR")
   address        String?
   invoiceFooterNote String?
+  expenseFooterNote String?
 }
 
 model Client {

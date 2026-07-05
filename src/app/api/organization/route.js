@@ -32,19 +32,24 @@ export async function PATCH(request) {
     }
 
     const body = await request.json();
-    const { name, address, invoiceFooterNote } = body;
+    const { name, address, invoiceFooterNote, expenseFooterNote, masterCurrency } = body;
+    const updateData = {};
 
-    if (!name || name.trim().length === 0) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    if (name !== undefined) {
+      if (!name || name.trim().length === 0) {
+        return NextResponse.json({ error: 'Name cannot be empty' }, { status: 400 });
+      }
+      updateData.name = name.trim();
     }
+    
+    if (address !== undefined) updateData.address = address?.trim() || null;
+    if (invoiceFooterNote !== undefined) updateData.invoiceFooterNote = invoiceFooterNote?.trim() || null;
+    if (expenseFooterNote !== undefined) updateData.expenseFooterNote = expenseFooterNote?.trim() || null;
+    if (masterCurrency !== undefined) updateData.masterCurrency = masterCurrency;
 
     const organization = await prisma.organization.update({
       where: { id: session.organizationId },
-      data: { 
-        name: name.trim(),
-        address: address?.trim() || null,
-        invoiceFooterNote: invoiceFooterNote?.trim() || null
-      }
+      data: updateData
     });
 
     return NextResponse.json({ organization });
