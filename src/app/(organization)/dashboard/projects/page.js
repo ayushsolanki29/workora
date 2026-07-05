@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -140,8 +141,8 @@ export default function ProjectsPage() {
                     </div>
                   </TableCell>
                   <TableCell>{project.client?.name || "-"}</TableCell>
-                  <TableCell>{new Date(project.startDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{project.estimatedEndDate ? new Date(project.estimatedEndDate).toLocaleDateString() : "-"}</TableCell>
+                  <TableCell>{formatDate(project.startDate)}</TableCell>
+                  <TableCell>{project.estimatedEndDate ? formatDate(project.estimatedEndDate) : "-"}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadge(project.status)}>
                       {project.status}

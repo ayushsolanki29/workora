@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DownloadIcon } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 
 export function InvoicePreviewDialog({ open, onOpenChange, invoice, masterCurrency = "INR", organization }) {
   if (!invoice) return null;
@@ -68,11 +68,11 @@ export function InvoicePreviewDialog({ open, onOpenChange, invoice, masterCurren
                     <div className="text-right flex gap-12">
                         <div>
                             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Issue Date</p>
-                            <p className="font-medium text-gray-900">{new Date(invoice.issueDate).toLocaleDateString()}</p>
+                            <p className="font-medium text-gray-900">{formatDate(invoice.issueDate)}</p>
                         </div>
                         <div>
                             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Due Date</p>
-                            <p className="font-medium text-gray-900">{new Date(invoice.dueDate).toLocaleDateString()}</p>
+                            <p className="font-medium text-gray-900">{formatDate(invoice.dueDate)}</p>
                         </div>
                     </div>
                 </div>

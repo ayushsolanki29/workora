@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -152,7 +153,7 @@ export default function ClientsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right text-muted-foreground text-sm">
-                    {new Date(client.createdAt).toLocaleDateString()}
+                    {formatDate(client.createdAt)}
                   </TableCell>
                 </TableRow>
               ))

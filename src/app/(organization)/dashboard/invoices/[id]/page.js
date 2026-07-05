@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
@@ -152,11 +153,11 @@ export default function InvoiceDetailsPage() {
           </div>
           <div className="border rounded-xl p-4 bg-card">
               <div className="text-sm text-muted-foreground mb-1">Issue Date</div>
-              <div className="font-medium">{new Date(invoice.issueDate).toLocaleDateString()}</div>
+              <div className="font-medium">{formatDate(invoice.issueDate)}</div>
           </div>
           <div className="border rounded-xl p-4 bg-card">
               <div className="text-sm text-muted-foreground mb-1">Due Date</div>
-              <div className="font-medium">{new Date(invoice.dueDate).toLocaleDateString()}</div>
+              <div className="font-medium">{formatDate(invoice.dueDate)}</div>
           </div>
           <div className="border rounded-xl p-4 bg-card">
               <div className="text-sm text-muted-foreground mb-1">Amount Due</div>
@@ -183,7 +184,7 @@ export default function InvoiceDetailsPage() {
             onClick={() => setActiveTab('payments')}
             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'payments' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'}`}
           >
-              Payments
+              Transactions
           </button>
           <button 
             onClick={() => setActiveTab('activity')}
@@ -277,36 +278,70 @@ export default function InvoiceDetailsPage() {
           )}
 
           {activeTab === 'payments' && (
-              <div className="bg-card border rounded-xl p-6">
-                  <h3 className="font-semibold text-lg mb-4">Payment History</h3>
-                  {invoice.payments?.length > 0 ? (
-                      <Table>
-                          <TableHeader>
-                              <TableRow>
-                                  <TableHead>Date</TableHead>
-                                  <TableHead>Method</TableHead>
-                                  <TableHead>Reference</TableHead>
-                                  <TableHead className="text-right">Amount</TableHead>
-                              </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                              {invoice.payments.map(payment => (
-                                  <TableRow key={payment.id}>
-                                      <TableCell>{new Date(payment.date).toLocaleDateString()}</TableCell>
-                                      <TableCell>{payment.method}</TableCell>
-                                      <TableCell>{payment.reference || '-'}</TableCell>
-                                      <TableCell className="text-right font-medium text-emerald-600">
-                                          +${payment.amount.toLocaleString()}
-                                      </TableCell>
+              <div className="flex flex-col gap-6">
+                  <div className="bg-card border rounded-xl p-6">
+                      <h3 className="font-semibold text-lg mb-4">Payment History</h3>
+                      {invoice.payments?.length > 0 ? (
+                          <Table>
+                              <TableHeader>
+                                  <TableRow>
+                                      <TableHead>Date</TableHead>
+                                      <TableHead>Method</TableHead>
+                                      <TableHead>Reference</TableHead>
+                                      <TableHead className="text-right">Amount</TableHead>
                                   </TableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  ) : (
-                      <div className="text-center py-12 text-muted-foreground">
-                          No payments have been recorded for this invoice yet.
-                      </div>
-                  )}
+                              </TableHeader>
+                              <TableBody>
+                                  {invoice.payments.map(payment => (
+                                      <TableRow key={payment.id}>
+                                          <TableCell>{formatDate(payment.date)}</TableCell>
+                                          <TableCell>{payment.method}</TableCell>
+                                          <TableCell>{payment.reference || '-'}</TableCell>
+                                          <TableCell className="text-right font-medium text-emerald-600">
+                                              +${payment.amount.toLocaleString()}
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
+                              </TableBody>
+                          </Table>
+                      ) : (
+                          <div className="text-center py-12 text-muted-foreground">
+                              No payments have been recorded for this invoice yet.
+                          </div>
+                      )}
+                  </div>
+
+                  <div className="bg-card border rounded-xl p-6">
+                      <h3 className="font-semibold text-lg mb-4">Linked Expenses</h3>
+                      {invoice.expenses?.length > 0 ? (
+                          <Table>
+                              <TableHeader>
+                                  <TableRow>
+                                      <TableHead>Date</TableHead>
+                                      <TableHead>Description</TableHead>
+                                      <TableHead>Category</TableHead>
+                                      <TableHead className="text-right">Amount</TableHead>
+                                  </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                  {invoice.expenses.map(expense => (
+                                      <TableRow key={expense.id}>
+                                          <TableCell>{formatDate(expense.date)}</TableCell>
+                                          <TableCell>{expense.description}</TableCell>
+                                          <TableCell>{expense.category}</TableCell>
+                                          <TableCell className="text-right font-medium text-destructive">
+                                              -${expense.amount.toLocaleString()}
+                                          </TableCell>
+                                      </TableRow>
+                                  ))}
+                              </TableBody>
+                          </Table>
+                      ) : (
+                          <div className="text-center py-12 text-muted-foreground">
+                              No expenses have been linked to this invoice.
+                          </div>
+                      )}
+                  </div>
               </div>
           )}
 

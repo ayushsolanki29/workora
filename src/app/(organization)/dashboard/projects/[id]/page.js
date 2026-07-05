@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeftIcon, CalendarIcon, UserIcon, PencilIcon, TrashIcon } from "lucide-react";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
@@ -135,16 +136,16 @@ export default function ProjectDetailsPage() {
                     <div className="flex items-center gap-3">
                         <CalendarIcon className="size-5 text-muted-foreground" />
                         <div>
-                            <p className="text-muted-foreground">Start Date</p>
-                            <p className="font-medium">{new Date(project.startDate).toLocaleDateString()}</p>
+                            <p className="text-sm text-muted-foreground">Start Date</p>
+                            <p className="font-medium">{formatDate(project.startDate)}</p>
                         </div>
                     </div>
                     {project.estimatedEndDate && (
                         <div className="flex items-center gap-3">
                             <CalendarIcon className="size-5 text-muted-foreground" />
-                            <div>
-                                <p className="text-muted-foreground">Estimated End Date</p>
-                                <p className="font-medium">{new Date(project.estimatedEndDate).toLocaleDateString()}</p>
+                            <div className="bg-muted/50 p-3 rounded-md">
+                                <p className="text-sm text-muted-foreground">Estimated End Date</p>
+                                <p className="font-medium">{formatDate(project.estimatedEndDate)}</p>
                             </div>
                         </div>
                     )}

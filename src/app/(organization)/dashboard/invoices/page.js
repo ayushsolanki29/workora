@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -241,8 +242,8 @@ export default function InvoicesPage() {
                     </div>
                   </TableCell>
                   <TableCell>{invoice.client?.name || "-"}</TableCell>
-                  <TableCell>{new Date(invoice.issueDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(invoice.dueDate).toLocaleDateString()}</TableCell>
+                  <TableCell>{formatDate(invoice.issueDate)}</TableCell>
+                  <TableCell>{formatDate(invoice.dueDate)}</TableCell>
                   <TableCell>
                       <div className="font-semibold text-gray-900">{formatCurrency(invoice.totalAmount * (invoice.exchangeRate || 1.0), masterCurrency)}</div>
                       {invoice.currency !== masterCurrency && (

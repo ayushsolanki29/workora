@@ -31,6 +31,7 @@ model Organization {
   clients   Client[]
   projects  Project[]
   invoices       Invoice[]
+  expenses       Expense[]
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   masterCurrency String    @default("INR")
@@ -51,6 +52,7 @@ model Client {
 
   projects       Project[]
   invoices       Invoice[]
+  expenses       Expense[]
 
   @@index([organizationId])
 }
@@ -70,6 +72,7 @@ model Project {
   updatedAt        DateTime     @updatedAt
   
   invoices         Invoice[]
+  expenses         Expense[]
 
   @@index([clientId])
   @@index([organizationId])
@@ -113,6 +116,7 @@ model Invoice {
   items           InvoiceItem[]
   payments        Payment[]
   activities      Activity[]
+  expenses        Expense[]
   
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -154,4 +158,32 @@ model Activity {
   
   invoiceId   String
   invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id             String       @id @default(uuid())
+  description    String
+  amount         Float
+  date           DateTime     @default(now())
+  category       String
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  clientId       String?
+  client         Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  
+  projectId      String?
+  project        Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  invoiceId      String?
+  invoice        Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([invoiceId])
 }

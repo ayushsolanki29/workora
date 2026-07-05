@@ -10,7 +10,8 @@ import {
     SettingsIcon, 
     HelpCircleIcon, 
     ActivityIcon, 
-    FolderIcon 
+    FolderIcon,
+    ReceiptIcon
 } from "lucide-react";
 
 export const navGroups = [
@@ -51,6 +52,11 @@ export const navGroups = [
 				title: "Payments",
 				path: "/dashboard/payments",
 				icon: <CreditCardIcon />,
+			},
+			{
+				title: "Expenses",
+				path: "/dashboard/expenses",
+				icon: <ReceiptIcon />,
 			},
 		],
 	},

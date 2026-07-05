@@ -18,7 +18,8 @@ export async function GET(request, { params }) {
         project: true,
         items: true,
         payments: { orderBy: { date: 'desc' } },
-        activities: { orderBy: { date: 'desc' } }
+        activities: { orderBy: { date: 'desc' } },
+        expenses: { orderBy: { date: 'desc' } }
       }
     });
 

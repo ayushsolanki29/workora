@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { CreditCardIcon, FileTextIcon, UserIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import API from "@/lib/api";
@@ -81,7 +81,7 @@ export default function PaymentsPage() {
               payments.map((payment) => (
                 <TableRow key={payment.id}>
                   <TableCell>
-                    {new Date(payment.date).toLocaleDateString()}
+                    {formatDate(payment.date)}
                   </TableCell>
                   <TableCell>
                     <Link href={`/dashboard/invoices/${payment.invoiceId}`} className="flex items-center gap-2 hover:underline">

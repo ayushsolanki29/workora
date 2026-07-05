@@ -11,3 +11,8 @@ export function formatCurrency(amount, currencyCode = "USD") {
     currency: currencyCode,
   }).format(amount || 0);
 }
+
+export function formatDate(date) {
+  if (!date) return "-";
+  return new Date(date).toLocaleDateString();
+}
