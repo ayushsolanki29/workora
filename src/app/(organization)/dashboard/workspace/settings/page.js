@@ -15,6 +15,7 @@ export default function WorkspaceSettingsPage() {
   const [invoiceFooterNote, setInvoiceFooterNote] = useState("");
   const [expenseFooterNote, setExpenseFooterNote] = useState("");
   const [masterCurrency, setMasterCurrency] = useState("USD");
+  const [hasTransactions, setHasTransactions] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
   const [isSavingGeneral, setIsSavingGeneral] = useState(false);
@@ -30,6 +31,11 @@ export default function WorkspaceSettingsPage() {
         setInvoiceFooterNote(res.data.organization.invoiceFooterNote || "");
         setExpenseFooterNote(res.data.organization.expenseFooterNote || "");
         setMasterCurrency(res.data.organization.masterCurrency || "USD");
+        
+        const counts = res.data.organization._count;
+        if (counts && (counts.invoices > 0 || counts.expenses > 0)) {
+          setHasTransactions(true);
+        }
       } catch (error) {
         toast.error("Failed to load organization settings");
       } finally {
@@ -210,7 +216,7 @@ export default function WorkspaceSettingsPage() {
                 <div className="space-y-2">
                     <div className="font-semibold text-sm">Master Currency</div>
                     <div className="text-xs text-muted-foreground mb-2">Your system-wide base currency for reporting.</div>
-                    <Select value={masterCurrency} onValueChange={setMasterCurrency} disabled={isSavingCurrency}>
+                    <Select value={masterCurrency} onValueChange={setMasterCurrency} disabled={isSavingCurrency || hasTransactions}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Select Currency" />
                         </SelectTrigger>
@@ -220,11 +226,16 @@ export default function WorkspaceSettingsPage() {
                             ))}
                         </SelectContent>
                     </Select>
+                    {hasTransactions && (
+                        <p className="text-xs text-amber-600 font-medium">
+                            Currency is locked because you have existing financial transactions.
+                        </p>
+                    )}
                 </div>
               </div>
           </CardContent>
           <CardFooter className="border-t px-6 py-4 bg-muted/20">
-            <Button type="submit" disabled={isSavingCurrency}>
+            <Button type="submit" disabled={isSavingCurrency || hasTransactions}>
               {isSavingCurrency ? "Saving..." : "Save Changes"}
             </Button>
           </CardFooter>

@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 
 import {
 	Avatar,
@@ -15,6 +16,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserIcon, BellIcon, CommandIcon, LifeBuoyIcon, GraduationCapIcon, CreditCardIcon, LogOutIcon } from "lucide-react";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 
 import { useRouter } from "next/navigation";
 import API from "@/lib/api";
@@ -28,6 +30,13 @@ const user = {
 
 export function NavUser() {
     const router = useRouter();
+    const [orgName, setOrgName] = useState("Loading...");
+
+    useEffect(() => {
+        API.get("/organization")
+            .then(res => setOrgName(res.data.organization.name))
+            .catch(() => setOrgName("Workora Workspace"));
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -43,20 +52,18 @@ export function NavUser() {
         <DropdownMenu>
             <DropdownMenuTrigger render={<button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring" />}>
                 <Avatar className="size-8">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <DynamicAvatar type="organization" seed={user.name} size={32} />
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60">
 				<DropdownMenuItem className="flex items-center justify-start gap-2">
 					<DropdownMenuLabel className="flex items-center gap-3">
 						<Avatar className="size-10">
-							<AvatarImage src={user.avatar} />
-							<AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+							<DynamicAvatar type="organization" seed={user.name} size={40} />
 						</Avatar>
-						<div>
-							<span className="font-medium text-foreground">{user.name}</span>{" "}
-							<br />
+						<div className="flex flex-col">
+							<span className="font-semibold text-sm text-foreground">{orgName}</span>
+							<span className="text-xs text-foreground mt-0.5">{user.name}</span>
 							<div
                                 className="max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap text-muted-foreground text-xs">
 								{user.email}

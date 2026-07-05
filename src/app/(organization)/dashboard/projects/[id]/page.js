@@ -9,6 +9,7 @@ import { ArrowLeftIcon, CalendarIcon, UserIcon, PencilIcon, TrashIcon } from "lu
 import API from "@/lib/api";
 import { toast } from "sonner";
 import { formatDate } from "@/lib/utils";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import {
   Sheet,
   SheetContent,
@@ -74,19 +75,24 @@ export default function ProjectDetailsPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl mx-auto flex flex-col gap-6">
+    <div className="p-8 flex flex-col gap-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard/projects")}>
           <ArrowLeftIcon className="size-5" />
         </Button>
         <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
-            <Badge variant={getStatusBadge(project.status)} className="text-sm">
-              {project.status}
-            </Badge>
+          <div className="flex items-center gap-4">
+            <DynamicAvatar type="project" seed={project.title} size={56} className="shadow-sm" />
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
+                <Badge variant={getStatusBadge(project.status)} className="text-sm">
+                  {project.status}
+                </Badge>
+              </div>
+              <p className="text-muted-foreground mt-1">Project Details and Timeline</p>
+            </div>
           </div>
-          <p className="text-muted-foreground mt-1">Project Details and Timeline</p>
         </div>
         <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => setIsEditSheetOpen(true)}>

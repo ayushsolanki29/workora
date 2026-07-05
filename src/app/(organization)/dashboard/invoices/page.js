@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RecordPaymentDialog } from "@/components/invoices/record-payment-dialog";
 import { InvoicePreviewDialog } from "@/components/invoices/invoice-preview-dialog";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState([]);
@@ -236,8 +237,8 @@ export default function InvoicesPage() {
               invoices.map((invoice) => (
                 <TableRow key={invoice.id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                        <FileTextIcon className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-3">
+                        <DynamicAvatar type="invoice" seed={invoice.invoiceNumber} size={32} />
                         {invoice.invoiceNumber}
                     </div>
                   </TableCell>

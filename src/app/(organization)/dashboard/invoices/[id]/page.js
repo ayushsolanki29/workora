@@ -30,6 +30,7 @@ import { useParams } from "next/navigation";
 import { RecordPaymentDialog } from "@/components/invoices/record-payment-dialog";
 import { InvoicePreviewDialog } from "@/components/invoices/invoice-preview-dialog";
 import { formatCurrency } from "@/lib/utils";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 
 import { useRouter } from "next/navigation";
 
@@ -115,10 +116,15 @@ export default function InvoiceDetailsPage() {
         </Button>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-                <h1 className="text-3xl font-bold tracking-tight">{invoice.invoiceNumber}</h1>
-                <Badge variant={getStatusBadge(invoice.status)} className="text-sm px-3 py-1">
-                    {invoice.status}
-                </Badge>
+                <DynamicAvatar type="invoice" seed={invoice.invoiceNumber} size={56} className="shadow-sm" />
+                <div>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-3xl font-bold tracking-tight">{invoice.invoiceNumber}</h1>
+                        <Badge variant={getStatusBadge(invoice.status)} className="text-sm px-3 py-1">
+                            {invoice.status}
+                        </Badge>
+                    </div>
+                </div>
             </div>
             <div className="flex flex-wrap gap-2">
                 <Button variant="outline" render={<Link href={`/dashboard/invoices/${invoice.id}/edit`} />} className="gap-2">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -144,7 +145,12 @@ export default function ClientsPage() {
             ) : (
               clients.map((client) => (
                 <TableRow key={client.id}>
-                  <TableCell className="font-medium">{client.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <DynamicAvatar type="client" seed={client.name} size={32} />
+                      {client.name}
+                    </div>
+                  </TableCell>
                   <TableCell>{client.email}</TableCell>
                   <TableCell>{client.phone || "-"}</TableCell>
                   <TableCell>

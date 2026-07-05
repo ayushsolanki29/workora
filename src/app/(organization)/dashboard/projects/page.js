@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -135,8 +136,8 @@ export default function ProjectsPage() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                        <FolderIcon className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-3">
+                        <DynamicAvatar type="project" seed={project.title} size={32} />
                         {project.title}
                     </div>
                   </TableCell>

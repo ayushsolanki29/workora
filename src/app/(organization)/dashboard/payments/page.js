@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { CreditCardIcon, FileTextIcon, UserIcon, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import API from "@/lib/api";
@@ -84,14 +85,14 @@ export default function PaymentsPage() {
                     {formatDate(payment.date)}
                   </TableCell>
                   <TableCell>
-                    <Link href={`/dashboard/invoices/${payment.invoiceId}`} className="flex items-center gap-2 hover:underline">
-                      <FileTextIcon className="size-4 text-muted-foreground" />
+                    <Link href={`/dashboard/invoices/${payment.invoiceId}`} className="flex items-center gap-3 hover:underline">
+                      <DynamicAvatar type="invoice" seed={payment.invoice.invoiceNumber} size={28} />
                       {payment.invoice.invoiceNumber}
                     </Link>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <UserIcon className="size-4 text-muted-foreground" />
+                    <div className="flex items-center gap-3">
+                      <DynamicAvatar type="client" seed={payment.invoice.client.name} size={28} />
                       {payment.invoice.client.name}
                     </div>
                   </TableCell>

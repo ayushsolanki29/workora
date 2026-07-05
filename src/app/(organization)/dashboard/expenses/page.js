@@ -13,6 +13,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { ReceiptIcon, FileTextIcon, UserIcon, PlusIcon, MoreHorizontal, Edit, Trash2, EyeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import API from "@/lib/api";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -106,23 +107,26 @@ export default function ExpensesPage() {
                     {formatDate(expense.date)}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {expense.description}
+                    <div className="flex items-center gap-3">
+                      <DynamicAvatar type="expense" seed={expense.description} size={32} />
+                      {expense.description}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {expense.category}
                   </TableCell>
                   <TableCell>
                     {expense.client ? (
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="size-4 text-muted-foreground" />
+                      <div className="flex items-center gap-3">
+                        <DynamicAvatar type="client" seed={expense.client.name} size={28} />
                         {expense.client.name}
                       </div>
                     ) : '-'}
                   </TableCell>
                   <TableCell>
                     {expense.invoice ? (
-                      <Link href={`/dashboard/invoices/${expense.invoiceId}`} className="flex items-center gap-2 hover:underline">
-                        <FileTextIcon className="size-4 text-muted-foreground" />
+                      <Link href={`/dashboard/invoices/${expense.invoiceId}`} className="flex items-center gap-3 hover:underline">
+                        <DynamicAvatar type="invoice" seed={expense.invoice.invoiceNumber} size={28} />
                         {expense.invoice.invoiceNumber}
                       </Link>
                     ) : '-'}

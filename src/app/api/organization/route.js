@@ -10,7 +10,12 @@ export async function GET(request) {
     }
 
     const organization = await prisma.organization.findUnique({
-      where: { id: session.organizationId }
+      where: { id: session.organizationId },
+      include: {
+        _count: {
+          select: { invoices: true, expenses: true }
+        }
+      }
     });
 
     if (!organization) {
@@ -45,7 +50,25 @@ export async function PATCH(request) {
     if (address !== undefined) updateData.address = address?.trim() || null;
     if (invoiceFooterNote !== undefined) updateData.invoiceFooterNote = invoiceFooterNote?.trim() || null;
     if (expenseFooterNote !== undefined) updateData.expenseFooterNote = expenseFooterNote?.trim() || null;
-    if (masterCurrency !== undefined) updateData.masterCurrency = masterCurrency;
+    if (masterCurrency !== undefined) {
+      // Prevent changing currency if transactions exist
+      const orgWithCounts = await prisma.organization.findUnique({
+        where: { id: session.organizationId },
+        include: {
+          _count: {
+            select: { invoices: true, expenses: true }
+          }
+        }
+      });
+      
+      const hasTransactions = orgWithCounts && (orgWithCounts._count.invoices > 0 || orgWithCounts._count.expenses > 0);
+      
+      if (hasTransactions && orgWithCounts.masterCurrency !== masterCurrency) {
+        return NextResponse.json({ error: 'Cannot change master currency because transactions exist.' }, { status: 400 });
+      }
+      
+      updateData.masterCurrency = masterCurrency;
+    }
 
     const organization = await prisma.organization.update({
       where: { id: session.organizationId },
