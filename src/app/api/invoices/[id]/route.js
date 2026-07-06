@@ -71,13 +71,52 @@ export async function PATCH(request, { params }) {
         discountAmount,
         totalAmount,
         exchangeRate,
+        notice,
         notes,
         terms,
         items
       } = body;
 
-    // Otherwise, full update (omitted for brevity, typically we'd delete items and recreate them)
-    return NextResponse.json({ error: 'Not implemented' }, { status: 501 });
+    const invoice = await prisma.invoice.update({
+      where: { id, organizationId: session.organizationId },
+      data: {
+        clientId,
+        projectId: projectId || null,
+        invoiceNumber,
+        status: status || 'Draft',
+        issueDate: issueDate ? new Date(issueDate) : undefined,
+        dueDate: dueDate ? new Date(dueDate) : undefined,
+        currency: currency || 'USD',
+        subtotal: parseFloat(subtotal) || 0,
+        taxAmount: parseFloat(taxAmount) || 0,
+        discountAmount: parseFloat(discountAmount) || 0,
+        totalAmount: parseFloat(totalAmount) || 0,
+        exchangeRate: parseFloat(exchangeRate) || 1.0,
+        notice,
+        notes,
+        terms,
+        items: {
+          deleteMany: {},
+          create: items?.map(item => ({
+            description: item.description,
+            quantity: parseInt(item.quantity) || 1,
+            unitPrice: parseFloat(item.unitPrice) || 0,
+            taxRate: parseFloat(item.taxRate) || 0,
+            total: parseFloat(item.total) || 0
+          })) || []
+        },
+        activities: {
+          create: [{ type: 'UPDATED', description: 'Invoice updated' }]
+        }
+      },
+      include: {
+        items: true,
+        client: true,
+        project: true
+      }
+    });
+
+    return NextResponse.json({ invoice });
   } catch (error) {
     console.error('Update invoice error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
