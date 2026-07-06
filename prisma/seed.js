@@ -8,7 +8,7 @@ async function main() {
   console.log('Seeding the database...');
 
   const existingAdmin = await prisma.user.findUnique({
-    where: { email: 'admin@workora.com' },
+    where: { email: 'admin@soseki.com' },
   });
 
   if (existingAdmin) {
@@ -19,7 +19,7 @@ async function main() {
   const passwordHash = await bcrypt.hash('password123', 10);
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@workora.com',
+      email: 'admin@soseki.com',
       passwordHash,
       name: 'Admin User',
     },

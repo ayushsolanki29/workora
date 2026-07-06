@@ -25,7 +25,7 @@ export default function ProfilePage() {
         const res = await API.get("/organization"); // Or a dedicated GET /api/users/profile
         // using the nav-user defaults for demo if we don't have a GET endpoint
         setName("Ayush Solanki");
-        setEmail("ayush@workora.com");
+        setEmail("ayush@soseki.com");
       } catch (error) {
         toast.error("Failed to load profile");
       } finally {

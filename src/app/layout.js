@@ -9,7 +9,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "Workora",
+  title: "Soseki",
   description: "All-in-one business operating platform for freelancers, consultants, and small agencies.",
 };
 

@@ -277,7 +277,7 @@ export async function Dashboard() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/10 z-10" />
                 <img 
                     src="/banner.jpeg" 
-                    alt="Welcome to Workora" 
+                    alt="Welcome to Soseki" 
                     className="absolute inset-0 w-full h-full object-cover" 
                 />
                 <div className="absolute bottom-6 left-6 z-20 text-white">

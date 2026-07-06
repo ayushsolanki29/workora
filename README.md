@@ -1,10 +1,10 @@
-# Workora
+# Soseki
 
 > All-in-one business operating platform for freelancers, consultants, and small agencies.
 
-Workora is a modern SaaS platform built to help freelancers and small businesses manage their entire workflow from one place. Instead of juggling spreadsheets, invoice generators, project trackers, and multiple tools, Workora provides a unified workspace to manage clients, projects, estimates, invoices, payments, and business insights.
+Soseki is a modern SaaS platform built to help freelancers and small businesses manage their entire workflow from one place. Instead of juggling spreadsheets, invoice generators, project trackers, and multiple tools, Soseki provides a unified workspace to manage clients, projects, estimates, invoices, payments, and business insights.
 
-> 🚧 Workora is currently in active development.
+> 🚧 Soseki is currently in active development.
 
 ---
 
@@ -66,7 +66,7 @@ Build a simple, fast, and professional business operating platform that helps se
 
 ## Contributing
 
-Workora is open source, and contributions are welcome.
+Soseki is open source, and contributions are welcome.
 
 Before contributing, please read the project guidelines in `AGENTS.md` and follow the established architecture, folder structure, and reusable component patterns.
 

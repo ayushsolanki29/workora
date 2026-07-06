@@ -67,7 +67,7 @@ export default function SetupOrganizationPage() {
         
         <div className="relative z-10 flex items-center gap-2">
           <LogoIcon className="size-8 brightness-0 invert" />
-          <span className="text-xl font-bold text-primary-foreground tracking-tight">Workora</span>
+          <span className="text-xl font-bold text-primary-foreground tracking-tight">Soseki</span>
         </div>
         
         <div className="relative z-10 space-y-6 max-w-lg mb-20">
@@ -95,7 +95,7 @@ export default function SetupOrganizationPage() {
         </div>
         
         <div className="relative z-10 text-primary-foreground/60 text-sm font-medium">
-          © {new Date().getFullYear()} Workora Inc. All rights reserved.
+          © {new Date().getFullYear()} Soseki Inc. All rights reserved.
         </div>
       </div>
 

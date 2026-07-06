@@ -95,7 +95,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 z-10" />
         <img
           src="/login-banner.jpeg"
-          alt="Workora Background"
+          alt="Soseki Background"
           className="absolute inset-0 w-full h-full object-cover opacity-90"
         />
         <div className="relative z-20 p-10 flex items-center gap-2 text-white">
@@ -103,7 +103,7 @@ export default function LoginPage() {
             <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm border border-white/10">
               <LogoIcon />
             </div>
-            <span className="text-xl font-bold font-heading tracking-tight">Workora</span>
+            <span className="text-xl font-bold font-heading tracking-tight">Soseki</span>
           </Link>
         </div>
 
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <Link href="/" className="hover:opacity-80 transition-opacity">
               <LogoIcon className="size-8 mb-4 text-foreground" />
             </Link>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Sign in to Workora</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">Sign in to Soseki</h1>
             <p className="text-sm text-muted-foreground">
               Welcome back. Enter your details below.
             </p>
@@ -209,7 +209,7 @@ export default function LoginPage() {
           </form>
 
           <div className="text-[14px] text-muted-foreground pt-4">
-            New to Workora?{" "}
+            New to Soseki?{" "}
             <Link href="/request-access" className="text-foreground font-medium hover:underline transition-colors">
               Get started
             </Link>

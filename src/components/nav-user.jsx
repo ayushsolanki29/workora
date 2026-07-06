@@ -38,7 +38,7 @@ export function NavUser() {
             setOrgName(orgRes.data.organization.name);
             setUser(userRes.data.user);
         }).catch(() => {
-            setOrgName("Workora Workspace");
+            setOrgName("Soseki Workspace");
             setUser({ name: "User", email: "" });
         });
     }, []);

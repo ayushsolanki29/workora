@@ -1,15 +1,15 @@
 {
-  "name": "workora",
+  "name": "soseki",
   "version": "1.0.0",
   "description": "All-in-one business operating platform for freelancers, consultants, and small agencies.",
   "author": "Ayush Solanki",
-  "homepage": "https://github.com/ayushsolanki29/workora",
+  "homepage": "https://github.com/ayushsolanki29/soseki",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ayushsolanki29/workora"
+    "url": "https://github.com/ayushsolanki29/soseki"
   },
   "bugs": {
-    "url": "https://github.com/ayushsolanki29/workora/issues"
+    "url": "https://github.com/ayushsolanki29/soseki/issues"
   },
   "license": "MIT",
   "private": true,

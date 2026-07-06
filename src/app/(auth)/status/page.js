@@ -22,7 +22,7 @@ function StatusContent() {
             <div className="bg-primary/5 p-2.5 rounded-xl border border-primary/10">
               <LogoIcon className="size-6 text-primary" />
             </div>
-            <span className="text-2xl font-bold font-heading tracking-tight text-slate-900">Workora</span>
+            <span className="text-2xl font-bold font-heading tracking-tight text-slate-900">Soseki</span>
           </Link>
         </div>
 
@@ -60,7 +60,7 @@ function StatusContent() {
         <div className="absolute inset-0 bg-gradient-to-bl from-primary/20 via-black/40 to-black/80 z-10" />
         <img
           src="/login-banner.jpeg"
-          alt="Workora Background"
+          alt="Soseki Background"
           className="absolute inset-0 w-full h-full object-cover opacity-70"
         />
         

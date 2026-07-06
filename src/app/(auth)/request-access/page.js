@@ -161,7 +161,7 @@ export default function RequestAccessPage() {
         <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-black/40 to-black/80 z-10" />
         <img
           src="/login-banner.jpeg"
-          alt="Workora Background"
+          alt="Soseki Background"
           className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
         <div className="relative z-20 p-12 flex items-center gap-3 text-white">
@@ -169,7 +169,7 @@ export default function RequestAccessPage() {
             <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-xl">
               <LogoIcon className="size-6" />
             </div>
-            <span className="text-2xl font-bold font-heading tracking-tight">Workora</span>
+            <span className="text-2xl font-bold font-heading tracking-tight">Soseki</span>
           </Link>
         </div>
 

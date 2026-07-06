@@ -20,7 +20,7 @@ export function AppHeader() {
     useEffect(() => {
         API.get("/organization")
             .then(res => setOrgName(res.data.organization.name))
-            .catch(() => setOrgName("Workora Workspace"));
+            .catch(() => setOrgName("Soseki Workspace"));
     }, []);
 	return (
         <header

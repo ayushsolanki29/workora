@@ -47,7 +47,7 @@ export function AppSidebar() {
 	return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader className="h-14 justify-center">
-				<SidebarMenuButton render={<Link href="/dashboard" />}><LogoIcon /><span className="font-medium">Workora</span></SidebarMenuButton>
+				<SidebarMenuButton render={<Link href="/dashboard" />}><LogoIcon /><span className="font-medium">Soseki</span></SidebarMenuButton>
 			</SidebarHeader>
             <SidebarContent>
 				<SidebarGroup>
@@ -108,7 +108,7 @@ export function AppSidebar() {
 					))}
 				</SidebarMenu>
 				<div className="mt-4 text-[10px] text-muted-foreground p-2 text-center group-data-[collapsible=icon]:hidden">
-					© 2026 Workora. All rights reserved.
+					© 2026 Soseki. All rights reserved.
 				</div>
 			</SidebarFooter>
         </Sidebar>
