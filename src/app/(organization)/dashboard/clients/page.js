@@ -195,11 +195,11 @@ export default function ClientsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/clients/${client.id}`} className="flex items-center w-full cursor-pointer">
+                        <DropdownMenuItem render={
+                          <Link href={`/dashboard/clients/${client.id}`} className="flex items-center w-full cursor-pointer" />
+                        }>
                             <EyeIcon className="size-4 mr-2" />
                             View details
-                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEditClick(client)}>
                           <EditIcon className="size-4 mr-2" />

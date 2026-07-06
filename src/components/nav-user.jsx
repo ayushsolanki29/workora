@@ -21,21 +21,26 @@ import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { useRouter } from "next/navigation";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import Link from "next/link";
 
-const user = {
-	name: "Ayush Solanki",
-	email: "ayush@workora.com",
-	avatar: "https://github.com/ayushsolanki29.png",
-};
+
 
 export function NavUser() {
     const router = useRouter();
     const [orgName, setOrgName] = useState("Loading...");
+    const [user, setUser] = useState({ name: "Loading...", email: "" });
 
     useEffect(() => {
-        API.get("/organization")
-            .then(res => setOrgName(res.data.organization.name))
-            .catch(() => setOrgName("Workora Workspace"));
+        Promise.all([
+            API.get("/organization"),
+            API.get("/auth/me")
+        ]).then(([orgRes, userRes]) => {
+            setOrgName(orgRes.data.organization.name);
+            setUser(userRes.data.user);
+        }).catch(() => {
+            setOrgName("Workora Workspace");
+            setUser({ name: "User", email: "" });
+        });
     }, []);
 
     const handleLogout = async () => {
@@ -62,10 +67,12 @@ export function NavUser() {
 							<DynamicAvatar type="organization" seed={orgName} size={40} />
 						</Avatar>
 						<div className="flex flex-col">
-							<span className="font-semibold text-sm text-foreground">{orgName}</span>
-							<span className="text-xs text-foreground mt-0.5">{user.name}</span>
+							<span className="font-semibold text-sm text-foreground">{user.name}</span>
+							{orgName && orgName.toLowerCase() !== user.name.toLowerCase() && (
+								<span className="text-xs text-foreground mt-0.5">{orgName}</span>
+							)}
 							<div
-                                className="max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap text-muted-foreground text-xs">
+                                className="max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap text-muted-foreground text-xs mt-1">
 								{user.email}
 							</div>
 						</div>
@@ -73,8 +80,10 @@ export function NavUser() {
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>
-						<UserIcon />
+					<DropdownMenuItem render={
+						<Link href="/dashboard/profile" className="flex items-center w-full cursor-pointer" />
+					}>
+						<UserIcon className="mr-2 size-4" />
 						Profile
 					</DropdownMenuItem>
 				</DropdownMenuGroup>

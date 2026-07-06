@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { Input } from "@/components/ui/input";
 import {
@@ -97,14 +97,28 @@ export default function ProjectsPage() {
     setMenuOpenId(null);
   };
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-        case 'Planning': return 'outline';
-        case 'Active': return 'default';
-        case 'Completed': return 'secondary';
-        case 'On Hold': return 'destructive';
-        default: return 'outline';
+  const getStatusClasses = (status, estimatedEndDate) => {
+    let displayStatus = status;
+    if (status !== 'Completed' && status !== 'Cancelled' && status !== 'Draft') {
+        if (estimatedEndDate && new Date(estimatedEndDate) < new Date()) {
+            displayStatus = 'Overdue';
+        }
     }
+    
+    const isGood = displayStatus === "Active" || displayStatus === "In Progress";
+    const isWarning = displayStatus === "Planning" || displayStatus === "Review";
+    const isBad = displayStatus === "Overdue" || displayStatus === "Cancelled" || displayStatus === "On Hold";
+    
+    return {
+        text: displayStatus,
+        classes: cn(
+            "inline-flex items-center px-2 py-1 rounded-md text-xs font-medium",
+            isGood ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400" :
+            isBad ? "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400" :
+            isWarning ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400" :
+            "bg-muted text-muted-foreground"
+        )
+    };
   }
 
   return (
@@ -178,9 +192,14 @@ export default function ProjectsPage() {
                   <TableCell>{formatDate(project.startDate)}</TableCell>
                   <TableCell>{project.estimatedEndDate ? formatDate(project.estimatedEndDate) : "-"}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusBadge(project.status)}>
-                      {project.status}
-                    </Badge>
+                    {(() => {
+                      const badgeInfo = getStatusClasses(project.status, project.estimatedEndDate);
+                      return (
+                        <span className={badgeInfo.classes}>
+                          {badgeInfo.text}
+                        </span>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu 
@@ -193,11 +212,11 @@ export default function ProjectsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/projects/${project.id}`} className="flex items-center w-full cursor-pointer">
+                        <DropdownMenuItem render={
+                          <Link href={`/dashboard/projects/${project.id}`} className="flex items-center w-full cursor-pointer" />
+                        }>
                             <EyeIcon className="size-4 mr-2" />
                             View details
-                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEditClick(project)}>
                           <EditIcon className="size-4 mr-2" />

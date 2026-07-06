@@ -50,18 +50,28 @@ const getProjectsColumns = () => [
     { header: "Client", render: (row) => <Link href={`/dashboard/clients/${row.clientId}`} className="hover:underline">{row.client?.name}</Link> },
     { header: "Due Date", render: (row) => row.estimatedEndDate ? formatDate(row.estimatedEndDate) : '-' },
     { header: "Status", render: (row) => {
-        const isGood = row.status === "Active" || row.status === "In Progress";
-        const isWarning = row.status === "Planning" || row.status === "Review";
+        let status = row.status;
+        if (status !== 'Completed' && status !== 'Cancelled' && status !== 'Draft') {
+            if (row.estimatedEndDate && new Date(row.estimatedEndDate) < new Date()) {
+                status = 'Overdue';
+            }
+        }
+        
+        const isGood = status === "Active" || status === "In Progress";
+        const isWarning = status === "Planning" || status === "Review";
+        const isBad = status === "Overdue" || status === "Cancelled";
+        
         return (
             <span 
                 className={cn(
                     "inline-flex items-center px-2 py-1 rounded-md text-xs font-medium",
                     isGood ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400" :
+                    isBad ? "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400" :
                     isWarning ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400" :
                     "bg-muted text-muted-foreground"
                 )}
             >
-                {row.status}
+                {status}
             </span>
         )
     }}
@@ -115,7 +125,7 @@ export async function Dashboard() {
     }
     const orgId = session.organizationId;
     
-    const [recentProjects, recentInvoices, recentClients, recentPayments] = await Promise.all([
+    const [recentProjects, recentInvoices, recentClients, recentPayments, organization, user] = await Promise.all([
         prisma.project.findMany({
             where: { organizationId: orgId, status: { in: ['Active', 'In Progress', 'Planning'] } },
             include: { client: true },
@@ -138,6 +148,12 @@ export async function Dashboard() {
             include: { invoice: { include: { client: true } } },
             orderBy: { date: 'desc' },
             take: 5
+        }),
+        prisma.organization.findUnique({
+            where: { id: orgId }
+        }),
+        prisma.user.findUnique({
+            where: { id: session.userId }
         })
     ]);
     
@@ -180,7 +196,7 @@ export async function Dashboard() {
         where: { 
             organizationId: orgId, 
             status: { in: ['Active', 'In Progress'] },
-            estimatedEndDate: { not: null, gte: new Date() }
+            estimatedEndDate: { not: null }
         },
         include: { client: true },
         orderBy: { estimatedEndDate: 'asc' },
@@ -199,22 +215,35 @@ export async function Dashboard() {
     });
 
     const deadlineItems = [
-        ...upcomingProjects.map(proj => ({
-            id: `dl-proj-${proj.id}`,
-            date: proj.estimatedEndDate,
-            title: `${proj.title} Deadline`,
-            subtitle: proj.client?.name,
-            meta: formatDate(proj.estimatedEndDate),
-            icon: <CalendarIcon />
-        })),
+        ...upcomingProjects.map(proj => {
+            const isOverdue = proj.estimatedEndDate && new Date(proj.estimatedEndDate) < new Date();
+            let metaLabel = formatDate(proj.estimatedEndDate);
+            if (isOverdue) {
+                const days = Math.floor((new Date() - new Date(proj.estimatedEndDate)) / (1000 * 60 * 60 * 24));
+                metaLabel = <span className="bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider">Overdue ({days}d)</span>;
+            }
+            return {
+                id: `dl-proj-${proj.id}`,
+                date: proj.estimatedEndDate,
+                title: `${proj.title} Deadline`,
+                subtitle: proj.client?.name,
+                meta: metaLabel,
+                icon: <CalendarIcon className={isOverdue ? "text-destructive" : ""} />
+            }
+        }),
         ...upcomingInvoices.map(inv => {
             const isOverdue = new Date(inv.dueDate) < new Date();
+            let metaLabel = formatDate(inv.dueDate);
+            if (isOverdue) {
+                const days = Math.floor((new Date() - new Date(inv.dueDate)) / (1000 * 60 * 60 * 24));
+                metaLabel = <span className="bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider">Overdue ({days}d)</span>;
+            }
             return {
                 id: `dl-inv-${inv.id}`,
                 date: inv.dueDate,
                 title: `${inv.client?.name} Invoice Due`,
                 subtitle: inv.invoiceNumber,
-                meta: isOverdue ? "Overdue" : formatDate(inv.dueDate),
+                meta: metaLabel,
                 icon: <AlertCircleIcon className={isOverdue ? "text-destructive" : ""} />
             };
         })
@@ -224,6 +253,23 @@ export async function Dashboard() {
     const upcomingDeadlines = deadlineItems
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 5);
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good morning";
+        if (hour < 18) return "Good afternoon";
+        return "Good evening";
+    };
+
+    const firstName = user?.name?.split(' ')[0] || 'there';
+    const rawOrgName = organization?.name || 'your workspace';
+    
+    // If the org name is just the user's name (common for freelancers), avoid sounding repetitive
+    const isFreelancerOrg = user?.name && rawOrgName.toLowerCase().includes(user.name.toLowerCase());
+    
+    // Count active items for impressive subtitle
+    const activeProjectCount = await prisma.project.count({ where: { organizationId: orgId, status: { in: ['Active', 'In Progress'] } }});
+    const pendingInvoiceCount = await prisma.invoice.count({ where: { organizationId: orgId, status: 'Pending' }});
 
 	return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -235,8 +281,14 @@ export async function Dashboard() {
                     className="absolute inset-0 w-full h-full object-cover" 
                 />
                 <div className="absolute bottom-6 left-6 z-20 text-white">
-                    <h2 className="text-2xl font-bold font-heading">Welcome to Workora</h2>
-                    <p className="text-white/80 mt-1">Here's what's happening with your business today.</p>
+                    <h2 className="text-3xl font-bold font-heading">{getGreeting()}, {firstName}</h2>
+                    <p className="text-white/90 mt-2 text-sm sm:text-base">
+                        {isFreelancerOrg 
+                            ? "Here is your workspace summary for today. "
+                            : <span>Here's what's happening at <span className="font-semibold text-white">{rawOrgName}</span> today. </span>
+                        }
+                        You have <span className="font-semibold text-white">{activeProjectCount} active projects</span> and <span className="font-semibold text-white">{pendingInvoiceCount} pending invoices</span>.
+                    </p>
                 </div>
             </div>
 
