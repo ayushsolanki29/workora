@@ -5,29 +5,58 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LogoIcon } from "@/components/logo";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import API from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   const router = useRouter();
   const [step, setStep] = useState("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [errors, setErrors] = useState({});
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (step === "email") {
+      const cleanEmail = email.trim().toLowerCase();
+      if (!cleanEmail || !EMAIL_REGEX.test(cleanEmail)) {
+        setErrors({ email: "Please enter a valid email address." });
+        return;
+      }
+      
       setIsLoading(true);
       try {
-        const res = await API.post("/auth/check-email", { email });
+        const res = await API.post("/auth/check-email", { email: cleanEmail });
         if (res.data.exists) {
           setStep("password");
         } else {
-          toast.error("Account not found", {
-            description: "No account is associated with this email.",
-          });
+          if (res.data.inWaitlist) {
+            setErrors({ 
+              email: (
+                <span>
+                  Your request is still on the waitlist.{" "}
+                  <Link href={`/status?email=${encodeURIComponent(cleanEmail)}`} className="underline hover:text-red-700 font-semibold">Check status here.</Link>
+                </span>
+              ) 
+            });
+          } else {
+            setErrors({ 
+              email: (
+                <span>
+                  Account not found. Want to join the waiting list?{" "}
+                  <Link href="/request-access" className="underline hover:text-red-700 font-semibold">Request access here.</Link>
+                </span>
+              ) 
+            });
+          }
         }
       } catch (error) {
         toast.error("Error", {
@@ -37,6 +66,11 @@ export default function LoginPage() {
         setIsLoading(false);
       }
     } else {
+      if (!password) {
+        setErrors({ password: "Password is required." });
+        return;
+      }
+      
       setIsLoading(true);
       try {
         const res = await API.post("/auth/login", { email, password });
@@ -44,12 +78,10 @@ export default function LoginPage() {
           toast.success("Successfully logged in!", {
             description: "Welcome back to your dashboard.",
           });
-          router.push("/dashboard");
+          window.location.href = "/dashboard";
         }
       } catch (error) {
-        toast.error("Login failed", {
-          description: error.response?.data?.error || "Invalid credentials. Please try again.",
-        });
+        setErrors({ password: error.response?.data?.error || "Invalid credentials. Please try again." });
       } finally {
         setIsLoading(false);
       }
@@ -67,10 +99,12 @@ export default function LoginPage() {
           className="absolute inset-0 w-full h-full object-cover opacity-90"
         />
         <div className="relative z-20 p-10 flex items-center gap-2 text-white">
-          <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm border border-white/10">
-            <LogoIcon />
-          </div>
-          <span className="text-xl font-bold font-heading tracking-tight">Workora</span>
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm border border-white/10">
+              <LogoIcon />
+            </div>
+            <span className="text-xl font-bold font-heading tracking-tight">Workora</span>
+          </Link>
         </div>
 
         <div className="relative z-20 p-10 mt-auto text-white">
@@ -85,9 +119,11 @@ export default function LoginPage() {
 
       {/* Right Panel - Login Form */}
       <div className="flex-1 flex flex-col justify-center items-center bg-background p-4 sm:p-8">
-        <div className="w-full max-w-[340px] space-y-8">
+        <div className="w-full max-w-[450px] space-y-8">
           <div className="flex flex-col space-y-2 items-start">
-            <LogoIcon className="size-8 mb-4 text-foreground" />
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <LogoIcon className="size-8 mb-4 text-foreground" />
+            </Link>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">Sign in to Workora</h1>
             <p className="text-sm text-muted-foreground">
               Welcome back. Enter your details below.
@@ -103,13 +139,20 @@ export default function LoginPage() {
                 id="email" 
                 type="email" 
                 placeholder="name@company.com" 
-                className="h-10 shadow-none bg-transparent rounded-md transition-colors" 
+                className={cn(
+                  "h-10 shadow-none bg-transparent rounded-md transition-colors",
+                  errors.email && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+                )}
                 required 
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrors((prev) => ({ ...prev, email: "" }));
+                }}
                 disabled={step === "password" || isLoading}
                 suppressHydrationWarning
               />
+              {errors.email && <p className="text-sm text-red-500 font-medium animate-in fade-in slide-in-from-top-1">{errors.email}</p>}
             </div>
             
             {step === "password" && (
@@ -123,16 +166,32 @@ export default function LoginPage() {
                       Forgot password?
                     </Link>
                   </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    className="h-10 shadow-none bg-transparent rounded-md transition-colors" 
-                    required 
-                    autoFocus 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                  />
+                  <div className="relative">
+                    <Input 
+                      id="password" 
+                      type={showPassword ? "text" : "password"} 
+                      className={cn(
+                        "h-10 shadow-none bg-transparent rounded-md transition-colors pr-10",
+                        errors.password && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500"
+                      )}
+                      required 
+                      autoFocus 
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setErrors((prev) => ({ ...prev, password: "" }));
+                      }}
+                      disabled={isLoading}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0 focus:outline-none"
+                    >
+                      {showPassword ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-sm text-red-500 font-medium animate-in fade-in slide-in-from-top-1">{errors.password}</p>}
                 </div>
 
                 <div className="flex items-start gap-2 pt-1 animate-in fade-in duration-300">

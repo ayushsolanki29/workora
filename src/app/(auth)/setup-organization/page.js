@@ -25,6 +25,15 @@ export default function SetupOrganizationPage() {
   const [masterCurrency, setMasterCurrency] = useState("USD");
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleLogout = async () => {
+    try {
+      await API.post("/auth/logout");
+      window.location.href = "/login";
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -57,7 +66,7 @@ export default function SetupOrganizationPage() {
         <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary-foreground/10 blur-3xl" />
         
         <div className="relative z-10 flex items-center gap-2">
-          <LogoIcon className="size-8 text-primary-foreground" />
+          <LogoIcon className="size-8 brightness-0 invert" />
           <span className="text-xl font-bold text-primary-foreground tracking-tight">Workora</span>
         </div>
         
@@ -91,7 +100,12 @@ export default function SetupOrganizationPage() {
       </div>
 
       {/* Right side: Setup Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-8 sm:p-12">
+      <div className="flex-1 flex flex-col justify-center items-center p-8 sm:p-12 relative">
+        <div className="absolute top-8 right-8">
+          <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+            Sign out
+          </Button>
+        </div>
         <div className="w-full max-w-[440px] space-y-8">
           <div className="flex flex-col space-y-2 text-center lg:text-left">
             <div className="flex justify-center lg:hidden mb-6">

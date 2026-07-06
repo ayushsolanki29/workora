@@ -17,7 +17,10 @@ export async function POST(request) {
     if (user) {
       return NextResponse.json({ exists: true });
     } else {
-      return NextResponse.json({ exists: false });
+      const waitlist = await prisma.waitlistLead.findUnique({
+        where: { email },
+      });
+      return NextResponse.json({ exists: false, inWaitlist: !!waitlist });
     }
   } catch (error) {
     console.error('Check email error:', error);

@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LogoIcon } from "@/components/logo";
 import { toast } from "sonner";
 import API from "@/lib/api";
@@ -28,6 +35,7 @@ const PROFESSIONS = [
   { id: "Designer", label: "Designer", icon: PaintbrushIcon },
   { id: "Marketer", label: "Marketer", icon: MegaphoneIcon },
   { id: "Freelancer", label: "Freelancer", icon: BriefcaseIcon },
+  { id: "Other", label: "Other", icon: StarIcon },
 ];
 
 const EARNINGS = [
@@ -55,9 +63,25 @@ export default function RequestAccessPage() {
     email: "",
     country: "",
     profession: "",
+    customProfession: "",
     earningsRange: "",
     previousTool: "",
+    customPreviousTool: "",
   });
+
+  useEffect(() => {
+    // Autodetect country without asking for location permissions
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.country_name) {
+          setFormData((prev) => ({ ...prev, country: data.country_name }));
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to detect country", err);
+      });
+  }, []);
 
   const [errors, setErrors] = useState({});
 
@@ -107,13 +131,19 @@ export default function RequestAccessPage() {
     setIsLoading(true);
 
     try {
+      const finalData = {
+        ...formData,
+        profession: formData.profession === "Other" ? formData.customProfession : formData.profession,
+        previousTool: formData.previousTool === "Other" ? formData.customPreviousTool : formData.previousTool
+      };
+      
       // POST using axios directly to avoid auth interceptors
-      const res = await API.post("/leads", formData);
+      const res = await API.post("/leads", finalData);
       if (res.data.success) {
-        setIsSuccess(true);
         toast.success("Request Submitted!", {
           description: "You've been added to our priority waitlist.",
         });
+        router.push(`/status?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (error) {
       toast.error("Submission failed", {
@@ -123,25 +153,6 @@ export default function RequestAccessPage() {
       setIsLoading(false);
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="flex min-h-screen bg-slate-50 items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-10 shadow-xl border border-slate-100 text-center animate-in zoom-in-95 duration-500 fade-in">
-          <div className="size-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2Icon className="size-8" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-3">You're on the list!</h1>
-          <p className="text-slate-600 mb-8 leading-relaxed">
-            Thank you for requesting access to Workora. We're rolling out invites soon and will notify you at <strong className="text-slate-900 font-medium">{formData.email}</strong>.
-          </p>
-          <Button onClick={() => router.push("/")} className="w-full h-11 text-base font-medium rounded-xl shadow-sm">
-            Return to Home
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen">
@@ -154,10 +165,12 @@ export default function RequestAccessPage() {
           className="absolute inset-0 w-full h-full object-cover opacity-60"
         />
         <div className="relative z-20 p-12 flex items-center gap-3 text-white">
-          <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-xl">
-            <LogoIcon className="size-6" />
-          </div>
-          <span className="text-2xl font-bold font-heading tracking-tight">Workora</span>
+          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-md border border-white/20 shadow-xl">
+              <LogoIcon className="size-6" />
+            </div>
+            <span className="text-2xl font-bold font-heading tracking-tight">Workora</span>
+          </Link>
         </div>
 
         <div className="relative z-20 p-12 mt-auto text-white">
@@ -180,9 +193,9 @@ export default function RequestAccessPage() {
           
           <div className="mb-10 text-center lg:text-left">
             <div className="flex justify-center lg:hidden mb-6">
-               <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+               <Link href="/" className="bg-white p-2 rounded-xl shadow-sm border border-slate-200 hover:opacity-80 transition-opacity">
                  <LogoIcon className="size-6 text-primary" />
-               </div>
+               </Link>
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">Request Access</h1>
             <p className="text-slate-500">
@@ -232,12 +245,24 @@ export default function RequestAccessPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700">Country (Optional)</label>
-                  <Input 
-                    placeholder="e.g. United States" 
-                    className="h-12 px-4 rounded-xl shadow-sm bg-white border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary text-base transition-all" 
-                    value={formData.country}
-                    onChange={(e) => handleChange("country", e.target.value)}
-                  />
+                  <Select value={formData.country} onValueChange={(val) => handleChange("country", val)}>
+                    <SelectTrigger className="h-12 px-4 rounded-xl shadow-sm bg-white border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary text-base transition-all">
+                      <SelectValue placeholder="Select your country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="United States">United States</SelectItem>
+                      <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                      <SelectItem value="Canada">Canada</SelectItem>
+                      <SelectItem value="Australia">Australia</SelectItem>
+                      <SelectItem value="Germany">Germany</SelectItem>
+                      <SelectItem value="France">France</SelectItem>
+                      <SelectItem value="India">India</SelectItem>
+                      <SelectItem value="Brazil">Brazil</SelectItem>
+                      <SelectItem value="Japan">Japan</SelectItem>
+                      <SelectItem value="South Africa">South Africa</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Button type="submit" className="w-full h-12 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all mt-4">
@@ -273,6 +298,17 @@ export default function RequestAccessPage() {
                       )
                     })}
                   </div>
+                  {formData.profession === "Other" && (
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2">
+                      <Input
+                        placeholder="E.g. Content Creator, Data Scientist..."
+                        className="h-12 px-4 rounded-xl shadow-sm bg-white border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary text-base transition-all"
+                        value={formData.customProfession}
+                        onChange={(e) => handleChange("customProfession", e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Earnings Selection */}
@@ -324,6 +360,17 @@ export default function RequestAccessPage() {
                       )
                     })}
                   </div>
+                  {formData.previousTool === "Other" && (
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2">
+                      <Input
+                        placeholder="E.g. Monday.com, Jira..."
+                        className="h-12 px-4 rounded-xl shadow-sm bg-white border-slate-200 focus-visible:ring-primary/20 focus-visible:border-primary text-base transition-all"
+                        value={formData.customPreviousTool}
+                        onChange={(e) => handleChange("customPreviousTool", e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-3 pt-4">

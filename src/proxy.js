@@ -8,7 +8,7 @@ export default async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // Paths that do not require authentication
-  const publicPaths = ['/login', '/signup', '/request-access', '/api/leads', '/api/auth/login', '/api/auth/refresh', '/api/auth/check-email'];
+  const publicPaths = ['/login', '/signup', '/request-access', '/status', '/api/leads', '/api/auth/login', '/api/auth/refresh', '/api/auth/check-email'];
 
   const token = request.cookies.get('accessToken')?.value;
 
@@ -17,7 +17,7 @@ export default async function proxy(request) {
 
   if (isPublicPath) {
     // If user has a token and tries to visit login/signup/request-access, redirect them to dashboard
-    if (token && (pathname === '/login' || pathname === '/signup' || pathname === '/request-access' || pathname === '/')) {
+    if (token && (pathname === '/login' || pathname === '/signup' || pathname === '/request-access' || pathname === '/status' || pathname === '/')) {
       try {
         const { payload } = await jwtVerify(token, secretKey);
         const hasOrg = payload.hasOrg === true;
