@@ -21,6 +21,8 @@ model User {
   updatedAt      DateTime  @updatedAt
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  supportTickets SupportTicket[]
+  supportMessages SupportTicketMessage[]
   sessions       Session[]
 }
 
@@ -41,6 +43,7 @@ model Organization {
   invoiceFooterNote String?
   expenseFooterNote String?
   dateFormat     String    @default("dd-MMM-yy")
+  supportTickets SupportTicket[]
 }
 
 model Client {
@@ -281,4 +284,35 @@ model QuestionnaireResponse {
 
   @@index([questionnaireId])
   @@index([clientId])
+}
+
+model SupportTicket {
+  id             String                 @id @default(uuid())
+  title          String
+  description    String
+  status         String                 @default("Open") // Open, In Progress, Resolved
+  priority       String                 @default("Medium") // Low, Medium, High
+  userId         String
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  messages       SupportTicketMessage[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model SupportTicketMessage {
+  id        String        @id @default(uuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId])
+  @@index([senderId])
 }

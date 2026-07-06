@@ -84,6 +84,11 @@ export const navGroups = [
 				icon: <UserCircleIcon />,
 			},
 			{
+				title: "Support Tickets",
+				path: "/dashboard/support",
+				icon: <HelpCircleIcon />,
+			},
+			{
 				title: "Data Migration",
 				path: "/dashboard/migration",
 				icon: <UploadCloudIcon />,
