@@ -35,7 +35,7 @@ export function DashboardStats() {
     if (isLoading) {
         return (
             <>
-                {[...Array(7)].map((_, i) => (
+                {[...Array(8)].map((_, i) => (
                     <Card className="shadow-none dark:ring-0" key={i}>
                         <CardHeader>
                             <Skeleton className="h-4 w-24" />

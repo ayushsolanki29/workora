@@ -115,6 +115,12 @@ export async function GET(request) {
     const profit = totalRevenue - totalExpenses;
     const profitLast30 = revenueLast30 - expensesLast30;
     const profitPrev30 = revenuePrev30 - expensesPrev30;
+
+    // Latest Active Questionnaire
+    const latestQuestionnaire = await prisma.questionnaire.findFirst({
+      where: { organizationId: orgId, status: 'Active' },
+      orderBy: { createdAt: 'desc' }
+    });
     
     const stats = [
       {
@@ -159,7 +165,7 @@ export async function GET(request) {
       },
       {
         label: "Payments Last 30 Days",
-        value: revenueLast30, // Using revenueLast30 as it's the exact same sum of payments
+        value: revenueLast30,
         delta: calcDelta(revenueLast30, revenuePrev30),
         footnote: "vs previous 30 days",
         lowerIsBetter: false,
@@ -174,6 +180,22 @@ export async function GET(request) {
         isCurrency: true
       }
     ];
+
+    let latestFormLabel = "Latest Form";
+    if (latestQuestionnaire) {
+        const title = latestQuestionnaire.title;
+        const shortTitle = title.length > 15 ? title.substring(0, 15) + '...' : title;
+        latestFormLabel = `Latest Form: ${shortTitle}`;
+    }
+
+    stats.push({
+        label: latestFormLabel,
+        value: latestQuestionnaire ? latestQuestionnaire.responseCount : 0,
+        delta: null,
+        footnote: "responses collected",
+        lowerIsBetter: false,
+        isCurrency: false
+    });
 
     return NextResponse.json({ stats, masterCurrency: org?.masterCurrency || 'USD' });
   } catch (error) {

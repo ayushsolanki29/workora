@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { UserPlusIcon, BriefcaseIcon, FileTextIcon, CreditCardIcon, ChevronLeftIcon } from "lucide-react";
+import { UserPlusIcon, BriefcaseIcon, FileTextIcon, CreditCardIcon, ChevronLeftIcon, ClipboardListIcon } from "lucide-react";
 
 export function HoverQuickActions() {
     const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +12,7 @@ export function HoverQuickActions() {
         { title: "Create Project", icon: <BriefcaseIcon className="size-4" />, href: "/dashboard/projects" },
         { title: "Generate Invoice", icon: <FileTextIcon className="size-4" />, href: "/dashboard/invoices" },
         { title: "Record Payment", icon: <CreditCardIcon className="size-4" />, href: "/dashboard/payments" },
+        { title: "Create Form", icon: <ClipboardListIcon className="size-4" />, href: "/dashboard/questionnaires/new" },
     ];
 
     return (

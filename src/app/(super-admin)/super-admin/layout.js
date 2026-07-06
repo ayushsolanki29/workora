@@ -36,14 +36,10 @@ export default function SuperAdminLayout({ children }) {
           path: "/super-admin/organizations",
           icon: <BuildingIcon />,
         },
+
         {
-          title: "Users",
-          path: "/super-admin/users",
-          icon: <UserIcon />,
-        },
-        {
-          title: "Leads",
-          path: "/super-admin/leads",
+          title: "Requested Access",
+          path: "/super-admin/access-requests",
           icon: <UsersIcon />,
         },
       ],

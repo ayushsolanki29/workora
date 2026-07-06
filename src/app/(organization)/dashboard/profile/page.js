@@ -22,10 +22,11 @@ export default function ProfilePage() {
     // We are simulating fetching the only user in the system here.
     const fetchUser = async () => {
       try {
-        const res = await API.get("/organization"); // Or a dedicated GET /api/users/profile
-        // using the nav-user defaults for demo if we don't have a GET endpoint
-        setName("Ayush Solanki");
-        setEmail("ayush@soseki.com");
+        const res = await API.get("/users/profile");
+        if (res.data?.user) {
+          setName(res.data.user.name || "");
+          setEmail(res.data.user.email || "");
+        }
       } catch (error) {
         toast.error("Failed to load profile");
       } finally {
@@ -113,7 +114,7 @@ export default function ProfilePage() {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="flex flex-col items-center gap-4">
                 <div className="size-24 rounded-full overflow-hidden border-4 border-background shadow-sm">
-                  <DynamicAvatar type="default" seed={name} size={96} />
+                  <DynamicAvatar type="user" seed={name} size={96} />
                 </div>
                 <div className="text-xs text-muted-foreground">Generated from your name</div>
               </div>

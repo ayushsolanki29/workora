@@ -17,7 +17,8 @@ import {
     CalendarIcon,
     PlusIcon,
     CreditCardIcon,
-    PieChartIcon
+    PieChartIcon,
+    ClipboardListIcon
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
@@ -118,6 +119,29 @@ const getPaymentsColumns = () => [
     { header: "Received On", render: (row) => formatDate(row.date) }
 ];
 
+const getQuestionnairesColumns = () => [
+    { header: "Title", render: (row) => <Link href={`/dashboard/questionnaires/${row.id}`} className="font-medium hover:underline">{row.title}</Link> },
+    { header: "Client", render: (row) => row.clientId ? <Link href={`/dashboard/clients/${row.clientId}`} className="hover:underline">{row.client?.name}</Link> : "-" },
+    { header: "Responses", render: (row) => <span className="font-medium">{row.responseCount} {row.maxResponses ? `/ ${row.maxResponses}` : ""}</span> },
+    { header: "Created", render: (row) => formatDate(row.createdAt) },
+    { header: "Status", render: (row) => {
+        const isGood = row.status === "Active";
+        const isWarning = row.status === "Paused";
+        return (
+            <span 
+                className={cn(
+                    "inline-flex items-center px-2 py-1 rounded-md text-xs font-medium",
+                    isGood ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400" :
+                    isWarning ? "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400" :
+                    "bg-muted text-muted-foreground"
+                )}
+            >
+                {row.status}
+            </span>
+        )
+    }}
+];
+
 export async function Dashboard() {
     const session = await getSession();
     if (!session?.organizationId) {
@@ -125,7 +149,7 @@ export async function Dashboard() {
     }
     const orgId = session.organizationId;
     
-    const [recentProjects, recentInvoices, recentClients, recentPayments, organization, user] = await Promise.all([
+    const [recentProjects, recentInvoices, recentClients, recentPayments, recentQuestionnaires, organization, user] = await Promise.all([
         prisma.project.findMany({
             where: { organizationId: orgId, status: { in: ['Active', 'In Progress', 'Planning'] } },
             include: { client: true },
@@ -147,6 +171,12 @@ export async function Dashboard() {
             where: { invoice: { organizationId: orgId } },
             include: { invoice: { include: { client: true } } },
             orderBy: { date: 'desc' },
+            take: 5
+        }),
+        prisma.questionnaire.findMany({
+            where: { organizationId: orgId },
+            include: { client: true },
+            orderBy: { createdAt: 'desc' },
             take: 5
         }),
         prisma.organization.findUnique({
@@ -182,6 +212,14 @@ export async function Dashboard() {
             subtitle: `${pay.invoice?.invoiceNumber} for ${formatCurrency(pay.amount, pay.invoice?.currency || "USD")}`,
             meta: formatDate(pay.date),
             icon: <CheckCircle2Icon className="text-emerald-500" />
+        })),
+        ...recentQuestionnaires.map(q => ({
+            id: `q-${q.id}`,
+            date: q.createdAt,
+            title: "Questionnaire created",
+            subtitle: q.title,
+            meta: formatDate(q.createdAt),
+            icon: <ClipboardListIcon className="text-blue-500" />
         }))
     ];
     
@@ -270,6 +308,7 @@ export async function Dashboard() {
     // Count active items for impressive subtitle
     const activeProjectCount = await prisma.project.count({ where: { organizationId: orgId, status: { in: ['Active', 'In Progress'] } }});
     const pendingInvoiceCount = await prisma.invoice.count({ where: { organizationId: orgId, status: 'Pending' }});
+    const activeQuestionnaireCount = await prisma.questionnaire.count({ where: { organizationId: orgId, status: 'Active' }});
 
 	return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -287,7 +326,7 @@ export async function Dashboard() {
                             ? "Here is your workspace summary for today. "
                             : <span>Here's what's happening at <span className="font-semibold text-white">{rawOrgName}</span> today. </span>
                         }
-                        You have <span className="font-semibold text-white">{activeProjectCount} active projects</span> and <span className="font-semibold text-white">{pendingInvoiceCount} pending invoices</span>.
+                        You have <span className="font-semibold text-white">{activeProjectCount} active projects</span>, <span className="font-semibold text-white">{pendingInvoiceCount} pending invoices</span>, and <span className="font-semibold text-white">{activeQuestionnaireCount} active questionnaires</span>.
                     </p>
                 </div>
             </div>
@@ -346,6 +385,15 @@ export async function Dashboard() {
                 data={recentPayments} 
                 actionLabel="View all payments"
                 actionPath="/dashboard/payments"
+            />
+
+            <DashboardDataTable 
+                className="md:col-span-2 lg:col-span-4"
+                title="Recent Questionnaires" 
+                columns={getQuestionnairesColumns()} 
+                data={recentQuestionnaires} 
+                actionLabel="View all questionnaires"
+                actionPath="/dashboard/questionnaires"
             />
 
             <HoverQuickActions />

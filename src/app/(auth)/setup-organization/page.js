@@ -123,7 +123,7 @@ export default function SetupOrganizationPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-4 group">
                   <div className="shrink-0 size-[52px] rounded-[1.25rem] overflow-hidden border border-muted transition-colors group-hover:border-primary/30 shadow-sm bg-muted/20">
-                    <DynamicAvatar type="default" seed={userName || "User"} size={52} />
+                    <DynamicAvatar type="user" seed={userName || "User"} size={52} />
                   </div>
                   <Input 
                     id="userName" 
