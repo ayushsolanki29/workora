@@ -46,7 +46,7 @@ export default function NewSupportTicketPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto w-full pt-4">
+    <div className="space-y-10 max-w-[70%] mx-auto w-full pt-10 pb-12">
       <Link href="/dashboard/support" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
         <ChevronLeftIcon className="mr-1 size-4" />
         Back to tickets
@@ -61,12 +61,12 @@ export default function NewSupportTicketPage() {
 
       <Card>
         <form onSubmit={handleSubmit}>
-          <CardHeader>
-            <CardTitle>Ticket Details</CardTitle>
-            <CardDescription>Fill out the form below to open a ticket.</CardDescription>
+          <CardHeader className="px-8 pt-8 pb-6">
+            <CardTitle className="text-2xl">Ticket Details</CardTitle>
+            <CardDescription className="text-base">Fill out the form below to open a ticket.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent className="space-y-8 px-8 pb-8">
+            <div className="space-y-3">
               <label className="text-sm font-medium">Issue Title</label>
               <Input
                 placeholder="e.g. Cannot generate invoice PDF"
@@ -77,7 +77,7 @@ export default function NewSupportTicketPage() {
               />
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-medium">Priority</label>
               <Select 
                 value={formData.priority} 
@@ -95,7 +95,7 @@ export default function NewSupportTicketPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               <label className="text-sm font-medium">Description</label>
               <Textarea
                 placeholder="Please describe what happened, steps to reproduce, etc."

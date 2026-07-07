@@ -30,8 +30,14 @@ API.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Mark to avoid infinite loops
 
+      const isSuperAdminRequest = originalRequest.url?.includes('/super-admin/');
+
       try {
-        // Attempt to refresh the token
+        if (isSuperAdminRequest) {
+          throw new Error("Super admin session expired");
+        }
+        
+        // Attempt to refresh the token for normal users
         await axios.post('/api/auth/refresh', {}, { withCredentials: true });
 
         // If successful, the new cookies are set. Retry the original request.
@@ -40,7 +46,7 @@ API.interceptors.response.use(
         // If refresh fails, it means the session is completely dead.
         // Redirect to login or handle logout state
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = isSuperAdminRequest ? '/super-admin/login' : '/login';
         }
         return Promise.reject(refreshError);
       }

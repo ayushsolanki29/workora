@@ -64,15 +64,27 @@ export default async function proxy(request) {
         const hasOrg = payload.hasOrg === true;
         return NextResponse.redirect(new URL(hasOrg ? '/dashboard' : '/setup-organization', request.url));
       } catch (error) {
-        // Token invalid, let them see the public page
+        // Token invalid, continue checking superToken
+      }
+    }
+    
+    // If super admin has a token and tries to visit public paths, redirect to super-admin dashboard
+    const superToken = request.cookies.get('superAccessToken')?.value;
+    if (superToken && (pathname === '/login' || pathname === '/signup' || pathname === '/request-access' || pathname === '/status' || pathname === '/')) {
+      try {
+        await jwtVerify(superToken, secretKey);
+        return NextResponse.redirect(new URL('/super-admin/dashboard', request.url));
+      } catch (error) {
         return NextResponse.next();
       }
     }
+
     return NextResponse.next();
   }
 
   // Paths that require authentication
-  if (!token) {
+  const superToken = request.cookies.get('superAccessToken')?.value;
+  if (!token && !superToken) {
     // If it's an API route, return 401
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -82,18 +94,23 @@ export default async function proxy(request) {
   }
 
   try {
-    // Verify token using jose (edge compatible)
-    const { payload } = await jwtVerify(token, secretKey);
-    
-    // Check organization routing rules
-    const hasOrg = payload.hasOrg === true;
-    
-    if (pathname.startsWith('/dashboard') && !hasOrg) {
-      return NextResponse.redirect(new URL('/setup-organization', request.url));
-    }
+    if (token) {
+      // Verify token using jose (edge compatible)
+      const { payload } = await jwtVerify(token, secretKey);
+      
+      // Check organization routing rules
+      const hasOrg = payload.hasOrg === true;
+      
+      if (pathname.startsWith('/dashboard') && !hasOrg) {
+        return NextResponse.redirect(new URL('/setup-organization', request.url));
+      }
 
-    if (pathname === '/setup-organization' && hasOrg) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      if (pathname === '/setup-organization' && hasOrg) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+    } else if (superToken) {
+      // Super admin accessing a normal route (like /api/support-tickets)
+      await jwtVerify(superToken, secretKey);
     }
 
     return NextResponse.next();

@@ -7,13 +7,24 @@ export async function POST(request, { params }) {
     const { id } = await params;
     const session = await getSession();
     
-    // Simulated auth fallback
+    // Simulated auth fallback - if no user session, assume super admin and use a dedicated support user
     let userId = session?.userId;
     
     if (!userId) {
-      const firstUser = await prisma.user.findFirst();
-      if (!firstUser) return NextResponse.json({ error: 'No user found' }, { status: 404 });
-      userId = firstUser.id;
+      let supportUser = await prisma.user.findUnique({
+        where: { email: 'admin@soseki.com' }
+      });
+      
+      if (!supportUser) {
+        supportUser = await prisma.user.create({
+          data: {
+            email: 'admin@soseki.com',
+            name: 'Soseki Support',
+            passwordHash: 'placeholder', // Not used for login
+          }
+        });
+      }
+      userId = supportUser.id;
     }
 
     const body = await request.json();

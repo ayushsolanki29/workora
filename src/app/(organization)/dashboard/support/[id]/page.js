@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import API from "@/lib/api";
 import { toast } from "sonner";
-import { ChevronLeftIcon, SendIcon } from "lucide-react";
+import { ChevronLeftIcon, SendIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -181,7 +181,7 @@ export default function SupportTicketDetailPage({ params }) {
                   disabled={isSending}
                 />
                 <Button type="submit" disabled={isSending || !messageContent.trim()} className="self-end px-3">
-                  <SendIcon className="size-4" />
+                  {isSending ? <Loader2 className="size-4 animate-spin" /> : <SendIcon className="size-4" />}
                 </Button>
               </form>
             )}
