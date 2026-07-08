@@ -1,0 +1,18 @@
+{
+  "name": "soseki-app",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:backend dev:frontend",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build": "npm --workspace backend run build && npm --workspace frontend run build"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

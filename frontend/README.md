@@ -72,15 +72,6 @@ Before contributing, please read the project guidelines in `AGENTS.md` and follo
 
 ---
 
-## Roadmap
-
-- [ ] MVP Release
-- [ ] Private Beta
-- [ ] Client Portal
-- [ ] Recurring Invoices
-- [ ] Team Collaboration
-- [ ] Public API
-- [ ] Integrations
 
 ---
 
