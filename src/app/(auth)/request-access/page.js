@@ -108,7 +108,7 @@ export default function RequestAccessPage() {
         // Check for disposable domains on the frontend using our list
         try {
           const domain = cleanEmail.split('@')[1];
-          const disposableDomains = require("../../../../index.json");
+          const disposableDomains = require("../../../lib/disposable-domains.json");
           if (disposableDomains.includes(domain)) {
             currentErrors.email = "Disposable email addresses are not allowed. Please use your primary email.";
           }
