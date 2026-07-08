@@ -62,7 +62,7 @@ const createClient = async (req, res) => {
       return res.status(400).json({ success: false, message: "Name is required" });
     }
 
-    if (!email || !/^\\S+@\\S+\\.\\S+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, message: "Valid email is required" });
     }
 

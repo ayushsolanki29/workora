@@ -2,7 +2,7 @@ const prisma = require("../../database/prisma");
 const disposableEmailDetector = require("disposable-email-detector");
 
 // Basic email regex for sanity check
-const EMAIL_REGEX = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const createLead = async (req, res) => {
   try {
