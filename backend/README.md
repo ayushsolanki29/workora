@@ -1,53 +1,57 @@
-# Project Backend
+# Backend
 
-A clean and reusable backend structure built with Node.js, Express, and Prisma 7.
+This folder contains the Express and Prisma backend for Soseki.
 
-## Getting Started
+## Purpose
 
-Follow these steps to set up and run the project locally:
+- Expose the API used by the frontend
+- Handle authentication, business logic, and validation
+- Manage database access through Prisma
+- Keep feature modules isolated and reusable
 
-### 1. Environment Setup
-Copy the example environment file and configure your database settings.
+## Main Areas
+
+- `src/app.js` and `src/server.js` - server bootstrap
+- `src/modules/` - feature modules such as clients, invoices, payments, and support
+- `src/database/` - Prisma client and seed logic
+- `prisma/` - schema and database configuration
+
+## Development
+
+Run the backend from the repository root:
+
 ```bash
-cp .env.example .env
-```
-> **Note:** Open the newly created `.env` file and change `project_db` to your actual database name in the `DATABASE_URL`.
-
-### 2. Install Dependencies
-```bash
-npm install
-```
-
-### 3. Database Initialization
-Push the schema to your database and generate the Prisma Client.
-```bash
-npm run db:dev
-```
-
-### 4. Seed Database
-Add the initial admin user to the database.
-```bash
-npm run db:seed
+npm run dev:backend
 ```
 
-### 5. Start Development Server
+Or run it directly from this folder:
+
 ```bash
 npm run dev
 ```
-The server will be available at `http://localhost:5050` (default).
 
----
+## Environment
 
-## Useful Commands
+Create `backend/.env` with:
 
-### Prisma Studio
-To view and manage your data in a browser-based UI:
-```bash
-npm run db:studio
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/soseki?schema=public"
+JWT_SECRET="your_super_secret_jwt_key"
+PORT=4000
+FRONTEND_URL="http://localhost:3000"
 ```
 
-### Manual Client Generation
-If you update the schema, regenerate the client with:
+## Database Commands
+
 ```bash
+npm run db:dev
+npm run db:seed
+npm run db:studio
 npm run db:generate
 ```
+
+## Notes
+
+- Keep backend-only implementation notes here
+- Keep product-level documentation in the root `docs/` folder
+- Keep shared setup instructions in [`SETUP.md`](../SETUP.md)

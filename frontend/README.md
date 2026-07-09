@@ -1,88 +1,45 @@
-# Soseki
+# Frontend
 
-> All-in-one business operating platform for freelancers, consultants, and small agencies.
+This folder contains the Next.js frontend for Soseki.
 
-Soseki is a modern SaaS platform built to help freelancers and small businesses manage their entire workflow from one place. Instead of juggling spreadsheets, invoice generators, project trackers, and multiple tools, Soseki provides a unified workspace to manage clients, projects, estimates, invoices, payments, and business insights.
+## Purpose
 
-> 🚧 Soseki is currently in active development.
+- Render the user interface
+- Handle dashboard, auth, and workspace pages
+- Keep UI components and client-side logic organized
+- Communicate with the backend API
 
----
+## Main Areas
 
-## Vision
+- `src/app/` - route groups and pages
+- `src/components/` - reusable UI and feature components
+- `src/lib/` - client utilities, API helpers, and shared constants
+- `public/` - static assets
 
-Build a simple, fast, and professional business operating platform that helps service-based businesses spend less time managing operations and more time delivering work.
+## Development
 
----
+Run the frontend from the repository root:
 
-## Goals
+```bash
+npm run dev:frontend
+```
 
-- Build a clean and intuitive user experience
-- Replace multiple disconnected business tools with one platform
-- Reduce manual administrative work
-- Support freelancers, consultants, and small agencies
-- Follow a scalable multi-tenant SaaS architecture
-- Keep the codebase modular, reusable, and easy to maintain
+Or run it directly from this folder:
 
----
+```bash
+npm run dev
+```
 
-## Planned MVP
+## Environment
 
-- Authentication
-- Dashboard
-- Client Management
-- Project Management
-- Estimate Generator
-- Invoice Generator
-- Payment Tracking
-- Business Reports
+Create `frontend/.env` with:
 
----
+```env
+NEXT_PUBLIC_API_URL="http://localhost:4000/api"
+```
 
-## Tech Stack
+## Notes
 
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- PostgreSQL
-- Prisma ORM
-- Supabase
-- Vercel
-- Cloudflare
-
----
-
-## Project Principles
-
-- Keep it simple
-- Build reusable components
-- Maintain a consistent architecture
-- Prefer composition over duplication
-- Write clean, maintainable code
-- Optimize for developer experience
-
----
-
-## Contributing
-
-Soseki is open source, and contributions are welcome.
-
-Before contributing, please read the project guidelines in `AGENTS.md` and follow the established architecture, folder structure, and reusable component patterns.
-
----
-
-
----
-
-## Author
-
-**Ayush Solanki**
-
-GitHub: https://github.com/ayushsolanki29
-
----
-
-## License
-
-MIT License
+- Keep frontend-only documentation here
+- Keep product-level documentation in the root `docs/` folder
+- Keep shared setup instructions in [`SETUP.md`](../SETUP.md)
