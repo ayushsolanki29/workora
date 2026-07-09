@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./frontend/public/logo.png" alt="Soseki Logo" width="150" />
+  <img style="border-radius: 30%;" src="./frontend/public/logo.png" alt="Soseki Logo" width="150" />
   <h1>Soseki</h1>
   <p><strong>An open-source business operating platform for freelancers, consultants, and small agencies.</strong></p>
   
