@@ -67,6 +67,18 @@ class SupportTicketsService {
       throw error;
     }
 
+    // Properly identify Super Admins dynamically instead of hardcoding on the frontend
+    const superAdmins = await prisma.superUser.findMany({ select: { email: true } });
+    const superAdminEmails = new Set(superAdmins.map(admin => admin.email));
+
+    ticket.messages = ticket.messages.map(msg => ({
+      ...msg,
+      sender: {
+        ...msg.sender,
+        isSuperAdmin: superAdminEmails.has(msg.sender.email),
+      }
+    }));
+
     return ticket;
   }
 
@@ -117,6 +129,12 @@ class SupportTicketsService {
       where: { id },
       data: { updatedAt: new Date() },
     });
+
+    // Properly identify Super Admins dynamically
+    const superAdmins = await prisma.superUser.findMany({ select: { email: true } });
+    const superAdminEmails = new Set(superAdmins.map(admin => admin.email));
+    
+    message.sender.isSuperAdmin = superAdminEmails.has(message.sender.email);
 
     return message;
   }
