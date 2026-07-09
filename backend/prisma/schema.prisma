@@ -23,6 +23,7 @@ model User {
   supportTickets SupportTicket[]
   supportMessages SupportTicketMessage[]
   sessions       Session[]
+  emailPreferences EmailPreference[]
 }
 
 model Organization {
@@ -323,4 +324,34 @@ model SuperUser {
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model EmailPreference {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String   // e.g., 'Marketing', 'Transactional', 'Alerts'
+  optOut    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, category])
+  @@index([userId])
+}
+
+model EmailQueue {
+  id           String   @id @default(uuid())
+  to           String
+  subject      String
+  htmlBody     String
+  category     String   @default("Transactional") // To check preferences before sending
+  status       String   @default("Pending") // Pending, Processing, Sent, Failed
+  attempts     Int      @default(0)
+  maxAttempts  Int      @default(3)
+  lastError    String?
+  nextRunAt    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status, nextRunAt])
 }

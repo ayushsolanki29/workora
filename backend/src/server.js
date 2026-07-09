@@ -8,9 +8,12 @@ const SERVER_URL = process.env.SERVER_URL || `http://localhost:${PORT}`;
 
 const server = http.createServer(app);
 
+const { startEmailWorker } = require("./modules/emails/email.worker");
+
 // Start Server
 server.listen(PORT, () => {
   console.log("\n========================================");
+  startEmailWorker();
   console.log("Soseki Backend Online");
   console.log("Server running on:", SERVER_URL);
   console.log("Client URL allowed:", CLIENT_URL);

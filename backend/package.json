@@ -37,13 +37,15 @@
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "express-rate-limit": "^8.5.2",
+    "handlebars": "^4.7.9",
     "helmet": "^8.1.0",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "pg": "^8.18.0",
-    "smart-passphrase": "^2.0.3"
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.3",
+    "pg": "^8.18.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",

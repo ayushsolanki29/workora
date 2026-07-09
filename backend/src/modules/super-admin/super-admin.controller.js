@@ -74,6 +74,26 @@ class SuperAdminController {
       next(error);
     }
   }
+
+  async getMailQueueStats(req, res, next) {
+    try {
+      const stats = await superAdminService.getMailQueueStats();
+      return res.status(200).json({ success: true, stats });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMailLogs(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 50;
+      const data = await superAdminService.getMailLogs(page, limit);
+      return res.status(200).json({ success: true, ...data });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new SuperAdminController();

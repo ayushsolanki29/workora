@@ -14,5 +14,7 @@ router.post("/users", validate(superAdminValidation.createUserValidation), super
 router.get("/organizations", superAdminController.getOrganizations);
 router.get("/tickets", superAdminController.getAllTickets);
 router.get("/access-requests", superAdminController.getAccessRequests);
+router.get("/mail/stats", superAdminController.getMailQueueStats);
+router.get("/mail/logs", superAdminController.getMailLogs);
 
 module.exports = router;

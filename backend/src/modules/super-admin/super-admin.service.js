@@ -146,6 +146,57 @@ class SuperAdminService {
     });
     return requests;
   }
+
+  async getMailQueueStats() {
+    const [pending, processing, sent, failed] = await Promise.all([
+      prisma.emailQueue.count({ where: { status: "Pending" } }),
+      prisma.emailQueue.count({ where: { status: "Processing" } }),
+      prisma.emailQueue.count({ where: { status: "Sent" } }),
+      prisma.emailQueue.count({ where: { status: "Failed" } })
+    ]);
+
+    return {
+      pending,
+      processing,
+      sent,
+      failed,
+      total: pending + processing + sent + failed
+    };
+  }
+
+  async getMailLogs(page = 1, limit = 50) {
+    const skip = (page - 1) * limit;
+    
+    const [logs, total] = await Promise.all([
+      prisma.emailQueue.findMany({
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip,
+        select: {
+          id: true,
+          to: true,
+          subject: true,
+          category: true,
+          status: true,
+          attempts: true,
+          lastError: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      }),
+      prisma.emailQueue.count()
+    ]);
+
+    return {
+      logs,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
+  }
 }
 
 module.exports = new SuperAdminService();
