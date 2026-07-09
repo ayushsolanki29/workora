@@ -18,6 +18,7 @@ const avatarStyles = {
   expense: rings,          // Abstract rings for expenses
   organization: glass,     // Glass style for organization
   questionnaire: 'disco',  // HTTP API fallback for disco style
+  superadmin: 'rings',     // HTTP API style specifically for Super Admins
   default: icons           // Glyphs (icons) as a fallback
 };
 

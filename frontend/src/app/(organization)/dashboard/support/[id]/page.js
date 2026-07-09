@@ -136,12 +136,12 @@ export default function SupportTicketDetailPage({ params }) {
             {/* Replies */}
             {ticket.messages.map((msg) => {
               // Assume super admin replies come from a different user or someone else.
-              const isSuperAdmin = msg.sender.email === 'admin@soseki.com';
+              const isSuperAdmin = msg.sender.isSuperAdmin;
               
               return (
                 <div key={msg.id} className={`flex gap-3 ${isSuperAdmin ? 'flex-row-reverse' : ''}`}>
                   <DynamicAvatar 
-                    type={isSuperAdmin ? "default" : "user"} 
+                    type={isSuperAdmin ? "superadmin" : "user"} 
                     seed={msg.sender.name || msg.sender.email} 
                     size={36} 
                   />

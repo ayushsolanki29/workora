@@ -79,15 +79,94 @@ export default function SuperAdminTicketDetailPage({ params }) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-5xl mx-auto w-full">
-        <Skeleton className="h-4 w-24 mb-4" />
-        <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="md:col-span-2 space-y-4">
-             <Skeleton className="h-[400px] w-full" />
+      <div className="space-y-6 max-w-5xl mx-auto w-full h-[calc(100vh-120px)] flex flex-col animate-in fade-in duration-500">
+        {/* Header Skeleton */}
+        <div className="shrink-0 flex items-start justify-between">
+          <div>
+            <Skeleton className="h-4 w-32 mb-4" />
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-48" />
           </div>
+          <div className="flex gap-2 items-center mt-8">
+            <Skeleton className="h-6 w-24 rounded-full" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-8 w-32 rounded-md ml-2" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0">
+          {/* Chat Area Skeleton */}
+          <div className="md:col-span-2 flex flex-col bg-card border rounded-lg overflow-hidden shadow-sm">
+            <div className="flex-1 overflow-y-auto p-4 space-y-8">
+              {/* Fake chat bubble 1 */}
+              <div className="flex gap-3">
+                <Skeleton className="size-9 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="h-20 w-3/4 rounded-lg rounded-tl-none" />
+                </div>
+              </div>
+              
+              {/* Fake chat bubble 2 (reply) */}
+              <div className="flex gap-3 flex-row-reverse">
+                <Skeleton className="size-9 rounded-full shrink-0" />
+                <div className="flex-1 flex flex-col items-end space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <Skeleton className="h-16 w-2/3 rounded-lg rounded-tr-none" />
+                </div>
+              </div>
+
+              {/* Fake chat bubble 3 */}
+              <div className="flex gap-3">
+                <Skeleton className="size-9 rounded-full shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="h-12 w-1/2 rounded-lg rounded-tl-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Input box skeleton */}
+            <div className="p-3 bg-muted/20 border-t flex gap-2">
+              <Skeleton className="h-[60px] w-full rounded-md" />
+              <Skeleton className="h-10 w-12 self-end rounded-md shrink-0" />
+            </div>
+          </div>
+
+          {/* Sidebar Skeleton */}
           <div className="space-y-4">
-             <Skeleton className="h-[200px] w-full" />
+            <Card>
+              <CardHeader className="py-4">
+                <Skeleton className="h-5 w-32" />
+              </CardHeader>
+              <CardContent className="space-y-6 pb-4">
+                <div>
+                  <Skeleton className="h-3 w-20 mb-2" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="pt-4 border-t">
+                  <Skeleton className="h-3 w-20 mb-3" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <Skeleton className="size-5 rounded-full" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                  <Skeleton className="h-3 w-48 ml-7" />
+                </div>
+                <div className="pt-4 border-t">
+                  <Skeleton className="h-3 w-20 mb-2" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -157,7 +236,7 @@ export default function SuperAdminTicketDetailPage({ params }) {
               return (
                 <div key={msg.id} className={`flex gap-3 ${isSuperAdmin ? 'flex-row-reverse' : ''}`}>
                   <DynamicAvatar 
-                    type={isSuperAdmin ? "default" : "user"} 
+                    type={isSuperAdmin ? "superadmin" : "user"} 
                     seed={msg.sender.name || msg.sender.email} 
                     size={36} 
                   />

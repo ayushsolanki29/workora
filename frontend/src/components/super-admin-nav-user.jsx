@@ -42,11 +42,11 @@ export function SuperAdminNavUser() {
     };
 
 	return (
-        <DropdownMenu>
+		<DropdownMenu>
             <DropdownMenuTrigger render={
                 <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="size-8">
-                        <DynamicAvatar type="user" seed="super-admin" size={32} />
+                        <DynamicAvatar type="superadmin" seed="super-admin" size={32} />
                     </Avatar>
                 </button>
             } />
@@ -54,7 +54,7 @@ export function SuperAdminNavUser() {
 				<DropdownMenuItem className="flex items-center justify-start gap-2">
 					<DropdownMenuLabel className="flex items-center gap-3">
 						<Avatar className="size-10">
-							<DynamicAvatar type="user" seed="super-admin" size={40} />
+							<DynamicAvatar type="superadmin" seed="super-admin" size={40} />
 						</Avatar>
 						<div className="flex flex-col">
 							<span className="font-semibold text-sm text-foreground">{user.name}</span>
