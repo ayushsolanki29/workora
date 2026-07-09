@@ -57,8 +57,24 @@ class SuperAdminService {
 
   async getOrganizations() {
     const organizations = await prisma.organization.findMany({
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: {
+            users: true,
+            projects: true,
+            clients: true,
+            invoices: true,
+          },
+        },
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
     return organizations;
   }

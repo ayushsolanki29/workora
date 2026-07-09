@@ -1,6 +1,5 @@
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
-import { prisma } from '@/lib/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-for-development';
 const secretKey = new TextEncoder().encode(JWT_SECRET);
@@ -31,20 +30,8 @@ export async function getSession(type = 'user') {
   const payload = await verifyToken(token);
   if (!payload || !payload.userId) return null;
 
-  if (type === 'superadmin') {
-    const userExists = await prisma.superUser.findUnique({
-      where: { id: payload.userId },
-      select: { id: true }
-    });
-    if (!userExists) return null;
-  } else {
-    const userExists = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { id: true }
-    });
-    if (!userExists) return null;
-  }
-
+  // In a stateless JWT setup, verifying the signature is sufficient for frontend rendering.
+  // The Node.js backend will enforce strict database checks on every API request.
   return payload;
 }
 

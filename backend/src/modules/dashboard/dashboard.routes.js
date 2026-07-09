@@ -7,5 +7,6 @@ router.use(authMiddleware);
 
 router.get("/stats", dashboardController.getStats);
 router.get("/charts", dashboardController.getCharts);
+router.get("/data", dashboardController.getDashboardData);
 
 module.exports = router;

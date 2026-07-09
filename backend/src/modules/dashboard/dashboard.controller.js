@@ -24,6 +24,18 @@ class DashboardController {
       next(error);
     }
   }
+
+  async getDashboardData(req, res, next) {
+    try {
+      const result = await dashboardService.getDashboardData(req.user.organizationId, req.user.id);
+      return res.status(200).json({ success: true, ...result });
+    } catch (error) {
+      if (error.status === 401) {
+        return res.status(error.status).json({ success: false, message: error.message });
+      }
+      next(error);
+    }
+  }
 }
 
 module.exports = new DashboardController();

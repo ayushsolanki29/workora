@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { serverFetch } from "@/lib/server-api";
 import {
   Table,
   TableBody,
@@ -13,14 +13,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default async function SuperAdminTicketsPage() {
-  const tickets = await prisma.supportTicket.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { name: true, email: true } },
-      organization: { select: { name: true } },
-      _count: { select: { messages: true } }
-    }
-  });
+  let tickets = [];
+  try {
+    const data = await serverFetch("/super-admin/tickets");
+    tickets = data.tickets || [];
+  } catch (error) {
+    console.error("Failed to fetch tickets:", error);
+  }
 
   return (
     <div className="space-y-6">

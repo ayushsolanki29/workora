@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { serverFetch } from "@/lib/server-api";
 import {
   Table,
   TableBody,
@@ -13,26 +13,13 @@ import { formatDate } from "@/lib/utils";
 import { AddUserModal } from "@/components/add-user-modal";
 
 export default async function SuperAdminOrganizationsPage() {
-  const organizations = await prisma.organization.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      _count: {
-        select: {
-          users: true,
-          projects: true,
-          clients: true,
-          invoices: true,
-        },
-      },
-      users: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
+  let organizations = [];
+  try {
+    const data = await serverFetch("/super-admin/organizations");
+    organizations = data.organizations || [];
+  } catch (error) {
+    console.error("Failed to fetch organizations:", error);
+  }
 
   return (
     <div className="space-y-6">

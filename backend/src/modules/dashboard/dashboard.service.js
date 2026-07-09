@@ -202,6 +202,92 @@ class DashboardService {
     return { stats, masterCurrency: org?.masterCurrency || "USD" };
   }
 
+  async getDashboardData(organizationId, userId) {
+    if (!organizationId) {
+      const error = new Error("Unauthorized: No organization found");
+      error.status = 401;
+      throw error;
+    }
+
+    const [recentProjects, recentInvoices, recentClients, recentPayments, recentQuestionnaires, organization, user, upcomingProjects, upcomingInvoices] = await Promise.all([
+      prisma.project.findMany({
+        where: { organizationId, status: { in: ['Active', 'In Progress', 'Planning'] } },
+        include: { client: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.invoice.findMany({
+        where: { organizationId },
+        include: { client: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.client.findMany({
+        where: { organizationId },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.payment.findMany({
+        where: { invoice: { organizationId } },
+        include: { invoice: { include: { client: true } } },
+        orderBy: { date: 'desc' },
+        take: 5
+      }),
+      prisma.questionnaire.findMany({
+        where: { organizationId },
+        include: { client: true },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      }),
+      prisma.organization.findUnique({
+        where: { id: organizationId }
+      }),
+      prisma.user.findUnique({
+        where: { id: userId }
+      }),
+      prisma.project.findMany({
+        where: { 
+            organizationId, 
+            status: { in: ['Active', 'In Progress'] },
+            estimatedEndDate: { not: null }
+        },
+        include: { client: true },
+        orderBy: { estimatedEndDate: 'asc' },
+        take: 3
+      }),
+      prisma.invoice.findMany({
+        where: { 
+            organizationId, 
+            status: { in: ['Pending', 'Overdue'] } 
+        },
+        include: { client: true },
+        orderBy: { dueDate: 'asc' },
+        take: 3
+      })
+    ]);
+
+    const activeProjectCount = await prisma.project.count({ where: { organizationId, status: { in: ['Active', 'In Progress'] } }});
+    const pendingInvoiceCount = await prisma.invoice.count({ where: { organizationId, status: 'Pending' }});
+    const activeQuestionnaireCount = await prisma.questionnaire.count({ where: { organizationId, status: 'Active' }});
+
+    return {
+      recentProjects,
+      recentInvoices,
+      recentClients,
+      recentPayments,
+      recentQuestionnaires,
+      organization,
+      user,
+      upcomingProjects,
+      upcomingInvoices,
+      counts: {
+        activeProjects: activeProjectCount,
+        pendingInvoices: pendingInvoiceCount,
+        activeQuestionnaires: activeQuestionnaireCount
+      }
+    };
+  }
+
   async getCharts(organizationId) {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");

@@ -14,7 +14,7 @@ import {
     CalendarIcon,
     ClipboardListIcon
 } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+import { serverFetch } from "@/lib/server-api";
 import { getSession } from "@/lib/auth";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { redirect } from "next/navigation";
@@ -143,43 +143,26 @@ export async function Dashboard() {
     }
     const orgId = session.organizationId;
     
-    const [recentProjects, recentInvoices, recentClients, recentPayments, recentQuestionnaires, organization, user] = await Promise.all([
-        prisma.project.findMany({
-            where: { organizationId: orgId, status: { in: ['Active', 'In Progress', 'Planning'] } },
-            include: { client: true },
-            orderBy: { createdAt: 'desc' },
-            take: 5
-        }),
-        prisma.invoice.findMany({
-            where: { organizationId: orgId },
-            include: { client: true },
-            orderBy: { createdAt: 'desc' },
-            take: 5
-        }),
-        prisma.client.findMany({
-            where: { organizationId: orgId },
-            orderBy: { createdAt: 'desc' },
-            take: 5
-        }),
-        prisma.payment.findMany({
-            where: { invoice: { organizationId: orgId } },
-            include: { invoice: { include: { client: true } } },
-            orderBy: { date: 'desc' },
-            take: 5
-        }),
-        prisma.questionnaire.findMany({
-            where: { organizationId: orgId },
-            include: { client: true },
-            orderBy: { createdAt: 'desc' },
-            take: 5
-        }),
-        prisma.organization.findUnique({
-            where: { id: orgId }
-        }),
-        prisma.user.findUnique({
-            where: { id: session.userId }
-        })
-    ]);
+    let data = {};
+    try {
+        const response = await serverFetch("/dashboard/data");
+        data = response || {};
+    } catch (e) {
+        console.error("Dashboard fetch error:", e);
+    }
+    
+    const {
+        recentProjects = [],
+        recentInvoices = [],
+        recentClients = [],
+        recentPayments = [],
+        recentQuestionnaires = [],
+        organization = {},
+        user = {},
+        upcomingProjects = [],
+        upcomingInvoices = [],
+        counts = {}
+    } = data;
     
     // 1. Generate Activity Timeline
     const timelineItems = [
@@ -223,28 +206,6 @@ export async function Dashboard() {
         .slice(0, 5);
 
     // 2. Generate Upcoming Deadlines
-    // Fetch upcoming project deadlines
-    const upcomingProjects = await prisma.project.findMany({
-        where: { 
-            organizationId: orgId, 
-            status: { in: ['Active', 'In Progress'] },
-            estimatedEndDate: { not: null }
-        },
-        include: { client: true },
-        orderBy: { estimatedEndDate: 'asc' },
-        take: 3
-    });
-
-    // Fetch upcoming/overdue invoice deadlines
-    const upcomingInvoices = await prisma.invoice.findMany({
-        where: { 
-            organizationId: orgId, 
-            status: { in: ['Pending', 'Overdue'] } 
-        },
-        include: { client: true },
-        orderBy: { dueDate: 'asc' },
-        take: 3
-    });
 
     const deadlineItems = [
         ...upcomingProjects.map(proj => {
@@ -300,9 +261,9 @@ export async function Dashboard() {
     const isFreelancerOrg = user?.name && rawOrgName.toLowerCase().includes(user.name.toLowerCase());
     
     // Count active items for impressive subtitle
-    const activeProjectCount = await prisma.project.count({ where: { organizationId: orgId, status: { in: ['Active', 'In Progress'] } }});
-    const pendingInvoiceCount = await prisma.invoice.count({ where: { organizationId: orgId, status: 'Pending' }});
-    const activeQuestionnaireCount = await prisma.questionnaire.count({ where: { organizationId: orgId, status: 'Active' }});
+    const activeProjectCount = counts.activeProjects || 0;
+    const pendingInvoiceCount = counts.pendingInvoices || 0;
+    const activeQuestionnaireCount = counts.activeQuestionnaires || 0;
 
 	return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

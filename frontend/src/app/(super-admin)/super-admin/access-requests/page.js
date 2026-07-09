@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { serverFetch } from "@/lib/server-api";
 import {
   Table,
   TableBody,
@@ -11,9 +11,13 @@ import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { formatDate } from "@/lib/utils";
 
 export default async function SuperAdminAccessRequestsPage() {
-  const requests = await prisma.waitlistLead.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  let requests = [];
+  try {
+    const data = await serverFetch("/super-admin/access-requests");
+    requests = data.requests || [];
+  } catch (error) {
+    console.error("Failed to fetch access requests:", error);
+  }
 
   return (
     <div className="space-y-6">
