@@ -1,4 +1,5 @@
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { SosekiBranding } from "@/components/shared/soseki-branding";
 
 function numberToWords(num) {
     if (!num || isNaN(num) || num === 0) return "Zero Only";
@@ -19,6 +20,28 @@ function numberToWords(num) {
 export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
   if (!invoice) return null;
 
+  const getClientContactInfo = (client) => {
+      const parts = [];
+      if (client?.gstin) parts.push(`GSTIN: ${client.gstin}`);
+      if (client?.phone) parts.push(`Mobile: ${client.phone}`);
+      if (client?.email) parts.push(`Email: ${client.email}`);
+      return parts.join(" | ");
+  };
+
+  const getOrgContactInfo = (org) => {
+      const parts = [];
+      if (org?.profile?.phone) parts.push(`Mobile: ${org.profile.phone}`);
+      if (org?.profile?.email) parts.push(`Email: ${org.profile.email}`);
+      return parts.join(" | ");
+  };
+
+  const getOrgTaxInfo = (org, cur) => {
+      const parts = [];
+      if (org?.profile?.taxId) parts.push(`${cur === "INR" ? "GSTIN" : "Tax ID"} - ${org.profile.taxId}`);
+      if (org?.profile?.registrationNumber) parts.push(`${cur === "INR" ? "PAN" : "Reg No."} - ${org.profile.registrationNumber}`);
+      return parts.join(" | ");
+  };
+
   return (
     <div className="bg-white text-black w-full min-h-full flex flex-col font-sans text-[11px] leading-tight p-4">
       <div className="border border-black flex flex-col h-full w-full mx-auto" style={{ minHeight: '277mm' }}>
@@ -38,16 +61,12 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <span className="font-bold text-base">{organization?.name}</span>
             {organization?.address && <span className="mt-1">{organization.address}</span>}
-            <div className="mt-1">
-              {organization?.profile?.phone && <span>Mobile: {organization.profile.phone} </span>}
-              {organization?.profile?.phone && organization?.profile?.email && <span>| </span>}
-              {organization?.profile?.email && <span>Email: {organization.profile.email}</span>}
-            </div>
-            <div className="mt-1">
-              {organization?.profile?.taxId && <span>{masterCurrency === "INR" ? "GSTIN" : "Tax ID"} - {organization.profile.taxId} </span>}
-              {organization?.profile?.taxId && organization?.profile?.registrationNumber && <span>| </span>}
-              {organization?.profile?.registrationNumber && <span>{masterCurrency === "INR" ? "PAN" : "Reg No."} - {organization.profile.registrationNumber}</span>}
-            </div>
+            {getOrgContactInfo(organization) && (
+                <div className="mt-1">{getOrgContactInfo(organization)}</div>
+            )}
+            {getOrgTaxInfo(organization, masterCurrency) && (
+                <div className="mt-1">{getOrgTaxInfo(organization, masterCurrency)}</div>
+            )}
           </div>
           <div className="w-24 shrink-0"></div> {/* Spacer for center alignment */}
         </div>
@@ -61,8 +80,12 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
             <span>: {formatDate(invoice.issueDate)}</span>
             <span className="font-semibold">Due date</span>
             <span>: {formatDate(invoice.dueDate)}</span>
-            <span className="font-semibold">Place of Supply</span>
-            <span>: {organization?.profile?.region || ""}</span>
+            {organization?.profile?.region && (
+                <>
+                    <span className="font-semibold">Place of Supply</span>
+                    <span>: {organization.profile.region}</span>
+                </>
+            )}
             <span className="font-semibold">Reverse Charge</span>
             <span>: No</span>
           </div>
@@ -73,22 +96,18 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
           <div className="border-r border-black p-2 px-3 flex flex-col gap-1">
             <span className="font-bold">Billing Details</span>
             <span className="font-semibold">{invoice.client?.name}</span>
-            <span className="text-xs">
-              {invoice.client?.gstin && <span>GSTIN: {invoice.client.gstin} | </span>}
-              {invoice.client?.phone && <span>Mobile: {invoice.client.phone} | </span>}
-              {invoice.client?.email && <span>Email: {invoice.client.email}</span>}
-            </span>
-            <span>{invoice.client?.address}</span>
+            {getClientContactInfo(invoice.client) && (
+                <span className="text-xs">{getClientContactInfo(invoice.client)}</span>
+            )}
+            {invoice.client?.address && <span>{invoice.client.address}</span>}
           </div>
           <div className="p-2 px-3 flex flex-col gap-1">
             <span className="font-bold">Shipping Details</span>
             <span className="font-semibold">{invoice.client?.name}</span>
-            <span className="text-xs">
-              {invoice.client?.gstin && <span>GSTIN: {invoice.client.gstin} | </span>}
-              {invoice.client?.phone && <span>Mobile: {invoice.client.phone} | </span>}
-              {invoice.client?.email && <span>Email: {invoice.client.email}</span>}
-            </span>
-            <span>{invoice.client?.address}</span>
+            {getClientContactInfo(invoice.client) && (
+                <span className="text-xs">{getClientContactInfo(invoice.client)}</span>
+            )}
+            {invoice.client?.address && <span>{invoice.client.address}</span>}
           </div>
         </div>
 
@@ -100,7 +119,6 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
               <th className="border-r border-black p-1 font-bold">Item Description</th>
               <th className="border-r border-black p-1 font-bold text-center w-12">Qty</th>
               <th className="border-r border-black p-1 font-bold text-right w-24">Price</th>
-              <th className="border-r border-black p-1 font-bold text-center w-16">Tax %</th>
               <th className="p-1 font-bold text-right w-28">Amount ({invoice.currency === "INR" ? "₹" : invoice.currency})</th>
             </tr>
           </thead>
@@ -111,13 +129,11 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
                 <td className="border-r border-black p-1 px-2">{item.description}</td>
                 <td className="border-r border-black p-1 px-2 text-center">{item.quantity}</td>
                 <td className="border-r border-black p-1 px-2 text-right">{Number(item.unitPrice).toFixed(2)}</td>
-                <td className="border-r border-black p-1 px-2 text-center">{item.taxRate || "0"}</td>
                 <td className="p-1 px-2 text-right">{Number(item.total).toFixed(2)}</td>
               </tr>
             ))}
             {/* Filler row to push footer down */}
             <tr style={{ height: '100%' }}>
-                <td className="border-r border-black p-1"></td>
                 <td className="border-r border-black p-1"></td>
                 <td className="border-r border-black p-1"></td>
                 <td className="border-r border-black p-1"></td>
@@ -130,20 +146,20 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
         {/* Discount & Total */}
         <div className="border-t border-black grid grid-cols-[1fr_7rem]">
             <div className="border-r border-black p-1 px-2">Discount</div>
-            <div className="p-1 px-2 text-right">- {Number(invoice.discountAmount || 0).toFixed(2)}</div>
+            <div className="p-1 px-2 text-right">- {formatCurrency(invoice.discountAmount || 0, invoice.currency)}</div>
         </div>
         <div className="border-t border-black grid grid-cols-[1fr_7rem]">
             <div className="border-r border-black p-1 px-2 font-bold text-center">Total</div>
-            <div className="p-1 px-2 text-right font-bold">{Number(invoice.totalAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+            <div className="p-1 px-2 text-right font-bold">{formatCurrency(invoice.totalAmount, invoice.currency)}</div>
         </div>
 
         {/* Amount in words and tax breakdown */}
         <div className="border-t border-black p-1 px-2 space-y-1">
-            <div className="font-bold">Rs. {numberToWords(invoice.totalAmount)}</div>
-            <div className="font-bold">Settled by - Bank : {Number(invoice.paidAmount || 0).toFixed(2)} | Invoice Balance : {Number(invoice.totalAmount - (invoice.paidAmount || 0)).toFixed(2)}</div>
+            <div className="font-bold uppercase">{invoice.currency} {numberToWords(invoice.totalAmount)}</div>
+            <div className="font-bold">Settled by - Bank : {formatCurrency(invoice.paidAmount || 0, invoice.currency)} | Invoice Balance : {formatCurrency(invoice.totalAmount - (invoice.paidAmount || 0), invoice.currency)}</div>
             {invoice.taxAmount > 0 && (
                 <div className="text-[10px]">
-                    Total Tax Applied: {Number(invoice.taxAmount).toFixed(2)}
+                    Total Tax Applied: {formatCurrency(invoice.taxAmount, invoice.currency)}
                 </div>
             )}
         </div>
@@ -183,6 +199,7 @@ export function TaxInvoice({ invoice, masterCurrency = "INR", organization }) {
             </div>
         </div>
 
+        <SosekiBranding monochrome={true} />
       </div>
     </div>
   );
