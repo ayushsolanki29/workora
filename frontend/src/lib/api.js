@@ -41,6 +41,14 @@ API.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Handle Blocked Organization
+    if (error.response?.status === 403 && error.response?.data?.code === 'ORG_BLOCKED') {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/blocked') {
+        window.location.href = '/blocked';
+      }
+      return Promise.reject(error);
+    }
+
     // Check if the error is 401 Unauthorized and we haven't already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Mark to avoid infinite loops

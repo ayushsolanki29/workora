@@ -2,6 +2,8 @@
 const Joi = require("joi");
 
 const invoiceItemSchema = Joi.object({
+  id: Joi.string().optional(),
+  invoiceId: Joi.string().optional(),
   description: Joi.string().required().messages({
     "string.empty": "Item description is required",
     "any.required": "Item description is required",

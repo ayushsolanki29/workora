@@ -274,8 +274,13 @@ class QuestionnairesService {
   // --- PUBLIC METHODS ---
 
   async getPublicQuestionnaire(slug) {
-    const questionnaire = await prisma.questionnaire.findUnique({
-      where: { slug },
+    const questionnaire = await prisma.questionnaire.findFirst({
+      where: {
+        OR: [
+          { slug: slug },
+          { id: slug }
+        ]
+      },
       include: {
         fields: {
           orderBy: { order: "asc" },

@@ -43,6 +43,7 @@ model Organization {
   invoiceFooterNote String?
   expenseFooterNote String?
   dateFormat     String    @default("dd-MMM-yy")
+  status         String    @default("Active") // Active, Blocked
   supportTickets SupportTicket[]
 }
 

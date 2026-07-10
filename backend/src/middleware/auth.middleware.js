@@ -50,11 +50,27 @@ const authMiddleware = async (req, res, next) => {
 
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { id: true, email: true, name: true, organizationId: true },
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        organizationId: true,
+        organization: {
+          select: { status: true }
+        }
+      },
     });
 
     if (!user) {
       return res.status(401).json({ success: false, message: "User not found" });
+    }
+
+    if (user.organization?.status === "Blocked") {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Your organization has been blocked.", 
+        code: "ORG_BLOCKED" 
+      });
     }
 
     req.user = user;

@@ -2,7 +2,7 @@
 const Joi = require("joi");
 
 const fieldSchema = Joi.object({
-  type: Joi.string().valid("ShortText", "LongText", "Email", "Select", "MultiSelect", "Date").required(),
+  type: Joi.string().required(),
   label: Joi.string().required(),
   description: Joi.string().allow(null, "").optional(),
   required: Joi.boolean().optional(),

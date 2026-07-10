@@ -142,6 +142,106 @@ class SuperAdminService {
     return organizations;
   }
 
+  async getOrganizationDetails(id) {
+    const organization = await prisma.organization.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            users: true,
+            projects: true,
+            clients: true,
+            invoices: true,
+          },
+        },
+        users: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (!organization) {
+      const error = new Error("Organization not found");
+      error.status = 404;
+      throw error;
+    }
+
+    // Calculate total earnings in master currency
+    const invoices = await prisma.invoice.findMany({
+      where: { 
+        organizationId: id,
+        status: { in: ["Paid", "Partially Paid"] }
+      },
+      select: {
+        paidAmount: true,
+        exchangeRate: true
+      }
+    });
+
+    const totalEarnings = invoices.reduce((acc, inv) => {
+      // Assuming exchangeRate converts invoice currency to master currency
+      return acc + (inv.paidAmount * (inv.exchangeRate || 1));
+    }, 0);
+
+    return { ...organization, totalEarnings };
+  }
+
+  async updateOrganization(id, data) {
+    const { name, masterCurrency, address, invoiceFooterNote, expenseFooterNote, dateFormat } = data;
+    const organization = await prisma.organization.update({
+      where: { id },
+      data: {
+        name,
+        masterCurrency,
+        address,
+        invoiceFooterNote,
+        expenseFooterNote,
+        dateFormat,
+      },
+    });
+    return organization;
+  }
+
+  async updateOrganizationStatus(id, status) {
+    if (!["Active", "Blocked"].includes(status)) {
+      const error = new Error("Invalid status");
+      error.status = 400;
+      throw error;
+    }
+    const organization = await prisma.organization.update({
+      where: { id },
+      data: { status },
+    });
+    return organization;
+  }
+
+  async changeOrgAdminPassword(id, newPassword) {
+    // Find the oldest user in the org (assuming they are the admin/owner)
+    const adminUser = await prisma.user.findFirst({
+      where: { organizationId: id },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (!adminUser) {
+      const error = new Error("No users found in this organization");
+      error.status = 404;
+      throw error;
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, authConfig.bcryptSaltRounds);
+    const updatedUser = await prisma.user.update({
+      where: { id: adminUser.id },
+      data: { passwordHash },
+    });
+
+    return updatedUser;
+  }
+
   async getAllTickets() {
     const tickets = await prisma.supportTicket.findMany({
       orderBy: { createdAt: "desc" },

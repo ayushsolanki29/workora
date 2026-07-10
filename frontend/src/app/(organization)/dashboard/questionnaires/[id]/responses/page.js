@@ -194,7 +194,7 @@ export default function QuestionnaireResponsesPage({ params }) {
               variant="outline" 
               className="gap-2"
               onClick={() => {
-                const url = `${window.location.origin}/q/${questionnaire.id}`;
+                const url = `${window.location.origin}/q/${questionnaire.slug}`;
                 navigator.clipboard.writeText(url);
                 toast.success("Link copied to clipboard!");
               }}

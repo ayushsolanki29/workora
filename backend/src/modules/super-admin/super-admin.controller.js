@@ -57,6 +57,48 @@ class SuperAdminController {
     }
   }
 
+  async getOrganizationDetails(req, res, next) {
+    try {
+      const { id } = req.params;
+      const organization = await superAdminService.getOrganizationDetails(id);
+      return res.status(200).json({ success: true, organization });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateOrganization(req, res, next) {
+    try {
+      const { id } = req.params;
+      const organization = await superAdminService.updateOrganization(id, req.body);
+      return res.status(200).json({ success: true, organization });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateOrganizationStatus(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const organization = await superAdminService.updateOrganizationStatus(id, status);
+      return res.status(200).json({ success: true, organization });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async changeOrgAdminPassword(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { newPassword } = req.body;
+      const user = await superAdminService.changeOrgAdminPassword(id, newPassword);
+      return res.status(200).json({ success: true, message: "Password updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getAllTickets(req, res, next) {
     try {
       const tickets = await superAdminService.getAllTickets();

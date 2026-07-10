@@ -11,6 +11,9 @@ import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { formatDate } from "@/lib/utils";
 
 import { AddUserModal } from "@/components/add-user-modal";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default async function SuperAdminOrganizationsPage() {
   let organizations = [];
@@ -44,6 +47,7 @@ export default async function SuperAdminOrganizationsPage() {
               <TableHead>Projects</TableHead>
               <TableHead>Invoices</TableHead>
               <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -59,7 +63,12 @@ export default async function SuperAdminOrganizationsPage() {
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
                       <DynamicAvatar type="organization" seed={org.id} size={32} />
-                      {org.name}
+                      <div className="flex flex-col">
+                        <span>{org.name}</span>
+                        {org.status === "Blocked" && (
+                          <Badge variant="destructive" className="w-fit mt-1 text-[10px]">Blocked</Badge>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>{org.masterCurrency}</TableCell>
@@ -81,6 +90,11 @@ export default async function SuperAdminOrganizationsPage() {
                   <TableCell>{org._count.projects}</TableCell>
                   <TableCell>{org._count.invoices}</TableCell>
                   <TableCell>{formatDate(org.createdAt)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/super-admin/organizations/${org.id}`}>View Details</Link>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
