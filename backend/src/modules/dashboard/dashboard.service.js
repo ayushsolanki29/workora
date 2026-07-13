@@ -1,4 +1,3 @@
-// src/modules/dashboard/dashboard.service.js
 const prisma = require("../../database/prisma");
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -15,47 +14,76 @@ class DashboardService {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-    const org = await prisma.organization.findUnique({
-      where: { id: organizationId },
-      select: { masterCurrency: true },
-    });
-
     const calcDelta = (current, previous) => {
       if (previous === 0) return current > 0 ? 100 : 0;
       return Number((((current - previous) / previous) * 100).toFixed(1));
     };
 
-    // 1. Total Revenue
-    const allPayments = await prisma.payment.findMany({
-      where: { invoice: { organizationId } },
-      select: { amount: true, date: true },
-    });
+    // Parallelize all stat queries and push aggregation to the database
+    const [
+      org,
+      
+      totalRevAgg,
+      revLast30Agg,
+      revPrev30Agg,
+      
+      // We fetch minimal fields for unpaid invoices to handle JS logic for overdue status
+      // (Since column comparison totalAmount > paidAmount is not natively supported in basic Prisma where)
+      unpaidInvoices,
+      
+      activeProjectsCount,
+      activeProjectsLast30Count,
+      activeProjectsPrev30Count,
+      
+      totalClientsCount,
+      clientsLast30Count,
+      clientsPrev30Count,
+      
+      totalExpAgg,
+      expLast30Agg,
+      expPrev30Agg,
+      
+      latestQuestionnaire
+    ] = await Promise.all([
+      prisma.organization.findUnique({ where: { id: organizationId }, select: { masterCurrency: true } }),
+      
+      prisma.payment.aggregate({ _sum: { amount: true }, where: { invoice: { organizationId } } }),
+      prisma.payment.aggregate({ _sum: { amount: true }, where: { invoice: { organizationId }, date: { gte: thirtyDaysAgo } } }),
+      prisma.payment.aggregate({ _sum: { amount: true }, where: { invoice: { organizationId }, date: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      
+      prisma.invoice.findMany({
+        where: { organizationId, status: { notIn: ["Draft", "Cancelled", "Paid"] } },
+        select: { totalAmount: true, paidAmount: true, createdAt: true, status: true, dueDate: true }
+      }),
+      
+      prisma.project.count({ where: { organizationId, status: { in: ["Active", "In Progress"] } } }),
+      prisma.project.count({ where: { organizationId, status: { in: ["Active", "In Progress"] }, createdAt: { gte: thirtyDaysAgo } } }),
+      prisma.project.count({ where: { organizationId, status: { in: ["Active", "In Progress"] }, createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      
+      prisma.client.count({ where: { organizationId, status: { not: "Inactive" } } }),
+      prisma.client.count({ where: { organizationId, status: { not: "Inactive" }, createdAt: { gte: thirtyDaysAgo } } }),
+      prisma.client.count({ where: { organizationId, status: { not: "Inactive" }, createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      
+      prisma.expense.aggregate({ _sum: { amount: true }, where: { organizationId } }),
+      prisma.expense.aggregate({ _sum: { amount: true }, where: { organizationId, date: { gte: thirtyDaysAgo } } }),
+      prisma.expense.aggregate({ _sum: { amount: true }, where: { organizationId, date: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+      
+      prisma.questionnaire.findFirst({
+        where: { organizationId, status: "Active" },
+        orderBy: { createdAt: "desc" },
+      })
+    ]);
 
-    let totalRevenue = 0;
-    let revenueLast30 = 0;
-    let revenuePrev30 = 0;
-
-    allPayments.forEach((p) => {
-      totalRevenue += p.amount;
-      if (p.date >= thirtyDaysAgo) {
-        revenueLast30 += p.amount;
-      } else if (p.date >= sixtyDaysAgo && p.date < thirtyDaysAgo) {
-        revenuePrev30 += p.amount;
-      }
-    });
-
-    // 2. Outstanding Payments
-    const allInvoices = await prisma.invoice.findMany({
-      where: { organizationId, status: { notIn: ["Draft", "Cancelled", "Paid"] } },
-      select: { totalAmount: true, paidAmount: true, createdAt: true, status: true, dueDate: true },
-    });
+    const totalRevenue = totalRevAgg._sum.amount || 0;
+    const revenueLast30 = revLast30Agg._sum.amount || 0;
+    const revenuePrev30 = revPrev30Agg._sum.amount || 0;
 
     let outstanding = 0;
     let overdueCount = 0;
     let overdueCreatedLast30 = 0;
     let overdueCreatedPrev30 = 0;
 
-    allInvoices.forEach((inv) => {
+    unpaidInvoices.forEach((inv) => {
       if (inv.paidAmount < inv.totalAmount) {
         outstanding += inv.totalAmount - inv.paidAmount;
       }
@@ -68,61 +96,21 @@ class DashboardService {
       }
     });
 
-    // 3. Active Projects
-    const projects = await prisma.project.findMany({
-      where: { organizationId },
-      select: { status: true, createdAt: true },
-    });
+    const activeProjects = activeProjectsCount;
+    const activeProjectsLast30 = activeProjectsLast30Count;
+    const activeProjectsPrev30 = activeProjectsPrev30Count;
 
-    let activeProjects = 0;
-    let activeProjectsLast30 = 0;
-    let activeProjectsPrev30 = 0;
-    projects.forEach((p) => {
-      if (p.status === "Active" || p.status === "In Progress") {
-        activeProjects++;
-      }
-      if (p.createdAt >= thirtyDaysAgo) activeProjectsLast30++;
-      else if (p.createdAt >= sixtyDaysAgo && p.createdAt < thirtyDaysAgo) activeProjectsPrev30++;
-    });
+    const totalClients = totalClientsCount;
+    const clientsLast30 = clientsLast30Count;
+    const clientsPrev30 = clientsPrev30Count;
 
-    // 4. Total Clients
-    const clients = await prisma.client.findMany({
-      where: { organizationId, status: { not: "Inactive" } },
-      select: { createdAt: true },
-    });
-
-    let totalClients = clients.length;
-    let clientsLast30 = 0;
-    let clientsPrev30 = 0;
-    clients.forEach((c) => {
-      if (c.createdAt >= thirtyDaysAgo) clientsLast30++;
-      else if (c.createdAt >= sixtyDaysAgo && c.createdAt < thirtyDaysAgo) clientsPrev30++;
-    });
-
-    // 5. Total Expenses
-    const expenses = await prisma.expense.findMany({
-      where: { organizationId },
-      select: { amount: true, date: true },
-    });
-
-    let totalExpenses = 0;
-    let expensesLast30 = 0;
-    let expensesPrev30 = 0;
-    expenses.forEach((e) => {
-      totalExpenses += e.amount;
-      if (e.date >= thirtyDaysAgo) expensesLast30 += e.amount;
-      else if (e.date >= sixtyDaysAgo && e.date < thirtyDaysAgo) expensesPrev30 += e.amount;
-    });
+    const totalExpenses = totalExpAgg._sum.amount || 0;
+    const expensesLast30 = expLast30Agg._sum.amount || 0;
+    const expensesPrev30 = expPrev30Agg._sum.amount || 0;
 
     const profit = totalRevenue - totalExpenses;
     const profitLast30 = revenueLast30 - expensesLast30;
     const profitPrev30 = revenuePrev30 - expensesPrev30;
-
-    // Latest Active Questionnaire
-    const latestQuestionnaire = await prisma.questionnaire.findFirst({
-      where: { organizationId, status: "Active" },
-      orderBy: { createdAt: "desc" },
-    });
 
     const stats = [
       {
@@ -209,41 +197,47 @@ class DashboardService {
       throw error;
     }
 
+    // Optimization: Use select instead of include to prevent over-fetching full client objects
+    const clientSelect = { id: true, name: true, email: true };
+
     const [recentProjects, recentInvoices, recentClients, recentPayments, recentQuestionnaires, organization, user, upcomingProjects, upcomingInvoices] = await Promise.all([
       prisma.project.findMany({
         where: { organizationId, status: { in: ['Active', 'In Progress', 'Planning'] } },
-        include: { client: true },
+        include: { client: { select: clientSelect } },
         orderBy: { createdAt: 'desc' },
         take: 5
       }),
       prisma.invoice.findMany({
         where: { organizationId },
-        include: { client: true },
+        include: { client: { select: clientSelect } },
         orderBy: { createdAt: 'desc' },
         take: 5
       }),
       prisma.client.findMany({
         where: { organizationId },
+        select: { id: true, name: true, email: true, status: true, createdAt: true },
         orderBy: { createdAt: 'desc' },
         take: 5
       }),
       prisma.payment.findMany({
         where: { invoice: { organizationId } },
-        include: { invoice: { include: { client: true } } },
+        include: { invoice: { select: { id: true, invoiceNumber: true, status: true, client: { select: clientSelect } } } },
         orderBy: { date: 'desc' },
         take: 5
       }),
       prisma.questionnaire.findMany({
         where: { organizationId },
-        include: { client: true },
+        include: { client: { select: clientSelect } },
         orderBy: { createdAt: 'desc' },
         take: 5
       }),
       prisma.organization.findUnique({
-        where: { id: organizationId }
+        where: { id: organizationId },
+        select: { id: true, name: true, masterCurrency: true, dateFormat: true, status: true }
       }),
       prisma.user.findUnique({
-        where: { id: userId }
+        where: { id: userId },
+        select: { id: true, name: true, email: true }
       }),
       prisma.project.findMany({
         where: { 
@@ -251,7 +245,7 @@ class DashboardService {
             status: { in: ['Active', 'In Progress'] },
             estimatedEndDate: { not: null }
         },
-        include: { client: true },
+        include: { client: { select: clientSelect } },
         orderBy: { estimatedEndDate: 'asc' },
         take: 3
       }),
@@ -260,15 +254,18 @@ class DashboardService {
             organizationId, 
             status: { in: ['Pending', 'Overdue'] } 
         },
-        include: { client: true },
+        include: { client: { select: clientSelect } },
         orderBy: { dueDate: 'asc' },
         take: 3
       })
     ]);
 
-    const activeProjectCount = await prisma.project.count({ where: { organizationId, status: { in: ['Active', 'In Progress'] } }});
-    const pendingInvoiceCount = await prisma.invoice.count({ where: { organizationId, status: 'Pending' }});
-    const activeQuestionnaireCount = await prisma.questionnaire.count({ where: { organizationId, status: 'Active' }});
+    // Also run counts concurrently with each other
+    const [activeProjectCount, pendingInvoiceCount, activeQuestionnaireCount] = await Promise.all([
+      prisma.project.count({ where: { organizationId, status: { in: ['Active', 'In Progress'] } } }),
+      prisma.invoice.count({ where: { organizationId, status: 'Pending' } }),
+      prisma.questionnaire.count({ where: { organizationId, status: 'Active' } })
+    ]);
 
     return {
       recentProjects,
@@ -300,22 +297,27 @@ class DashboardService {
     const startOfYear = new Date(currentYear, 0, 1);
     const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59);
 
-    // 1. Revenue Overview Data
-    const paymentsThisYear = await prisma.payment.findMany({
-      where: {
-        invoice: { organizationId },
-        date: { gte: startOfYear, lte: endOfYear },
-      },
-      select: { amount: true, date: true },
-    });
-
-    const expensesThisYear = await prisma.expense.findMany({
-      where: {
-        organizationId,
-        date: { gte: startOfYear, lte: endOfYear },
-      },
-      select: { amount: true, date: true },
-    });
+    // Parallelize all chart data fetching
+    const [paymentsThisYear, expensesThisYear, allInvoices] = await Promise.all([
+      prisma.payment.findMany({
+        where: {
+          invoice: { organizationId },
+          date: { gte: startOfYear, lte: endOfYear },
+        },
+        select: { amount: true, date: true },
+      }),
+      prisma.expense.findMany({
+        where: {
+          organizationId,
+          date: { gte: startOfYear, lte: endOfYear },
+        },
+        select: { amount: true, date: true },
+      }),
+      prisma.invoice.findMany({
+        where: { organizationId },
+        select: { status: true, dueDate: true, totalAmount: true, paidAmount: true },
+      })
+    ]);
 
     const monthlyData = MONTHS.map((month) => ({ month, revenue: 0, expenses: 0 }));
 
@@ -342,12 +344,6 @@ class DashboardService {
         growthPctNum = 100;
       }
     }
-
-    // 2. Invoice Status Distribution
-    const allInvoices = await prisma.invoice.findMany({
-      where: { organizationId },
-      select: { status: true, dueDate: true, totalAmount: true, paidAmount: true },
-    });
 
     let counts = { paid: 0, pending: 0, overdue: 0, draft: 0 };
     let totalValid = 0;

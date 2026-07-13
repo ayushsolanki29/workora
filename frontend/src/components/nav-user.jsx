@@ -65,8 +65,8 @@ export function NavUser() {
 							<DynamicAvatar type="organization" seed={orgName} size={40} />
 						</Avatar>
 						<div className="flex flex-col">
-							<span className="font-semibold text-sm text-foreground">{user.name}</span>
-							{orgName && orgName.toLowerCase() !== user.name.toLowerCase() && (
+							<span className="font-semibold text-sm text-foreground">{user?.name || "User"}</span>
+							{orgName && user?.name && orgName.toLowerCase() !== user.name.toLowerCase() && (
 								<span className="text-xs text-foreground mt-0.5">{orgName}</span>
 							)}
 							<div
