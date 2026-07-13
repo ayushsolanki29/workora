@@ -29,6 +29,22 @@ const createLeadValidation = Joi.object({
   customPreviousTool: Joi.string().trim().max(50).allow("").optional(),
 });
 
+const validateEmailValidation = Joi.object({
+  email: Joi.string().trim().email().max(100).required().custom((value, helpers) => {
+    const domain = value.split('@')[1];
+    if (disposableDomains.includes(domain)) {
+      return helpers.message("Disposable email addresses are not allowed. Please use your primary email.");
+    }
+    return value;
+  }).messages({
+    "string.email": "Please enter a valid email address format.",
+    "string.empty": "Email is required and must be valid.",
+    "string.max": "Email is too long.",
+    "any.required": "Email is required and must be valid.",
+  }),
+});
+
 module.exports = {
   createLeadValidation,
+  validateEmailValidation,
 };

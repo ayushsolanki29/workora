@@ -77,8 +77,9 @@ export default function RequestAccessPage() {
           setFormData((prev) => ({ ...prev, country: data.country_name }));
         }
       })
-      .catch((err) => {
-        console.error("Failed to detect country", err);
+      .catch(() => {
+        // Silently fail if blocked by adblockers or privacy extensions
+        // Country is optional anyway, so it's fine if auto-detect fails
       });
   }, []);
 
@@ -91,7 +92,7 @@ export default function RequestAccessPage() {
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const handleNext = (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
     if (step === 1) {
       let currentErrors = {};
@@ -109,13 +110,37 @@ export default function RequestAccessPage() {
         setErrors(currentErrors);
         return;
       }
+      
+      // Perform server-side validation (e.g. disposable email block & waitlist duplication check)
+      try {
+        setIsLoading(true);
+        await API.post("/leads/validate-email", { email: cleanEmail });
+      } catch (err) {
+        const errorMsg = err.response?.data?.error || err.response?.data?.message || "Invalid email.";
+        setErrors({ email: errorMsg });
+        return;
+      } finally {
+        setIsLoading(false);
+      }
     }
+    
     setErrors({});
     setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.profession === "Other" && (!formData.customProfession || formData.customProfession.trim() === "")) {
+      toast.error("Please specify your profession");
+      return;
+    }
+    
+    if (formData.previousTool === "Other" && (!formData.customPreviousTool || formData.customPreviousTool.trim() === "")) {
+      toast.error("Please specify your previous tool");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -134,9 +159,20 @@ export default function RequestAccessPage() {
         router.push(`/status?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (error) {
-      toast.error("Submission failed", {
-        description: error.response?.data?.error || "Something went wrong. Please try again.",
-      });
+      const errorMsg = error.response?.data?.error || error.response?.data?.message || "Something went wrong. Please try again.";
+      
+      // Intelligently route backend validation errors to the appropriate fields inline
+      if (errorMsg.toLowerCase().includes("email")) {
+        setErrors({ email: errorMsg });
+        setStep(1); // Go back to step 1 so the user can see the error under the email field
+      } else if (errorMsg.toLowerCase().includes("name")) {
+        setErrors({ fullName: errorMsg });
+        setStep(1);
+      } else {
+        toast.error("Submission failed", {
+          description: errorMsg,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +233,7 @@ export default function RequestAccessPage() {
             <div className={`h-1.5 rounded-full flex-1 transition-colors duration-500 ${step >= 2 ? 'bg-primary' : 'bg-slate-200'}`} />
           </div>
 
-          <form className="space-y-6" onSubmit={step === 2 ? handleSubmit : handleNext}>
+          <form className="space-y-6" onSubmit={step === 2 ? handleSubmit : handleNext} noValidate>
             {step === 1 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="space-y-2">
@@ -253,8 +289,12 @@ export default function RequestAccessPage() {
                   </Select>
                 </div>
 
-                <Button type="submit" className="w-full h-12 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all mt-4">
-                  Continue to Step 2
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all mt-4"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Validating..." : "Continue to Step 2"}
                 </Button>
               </div>
             )}
@@ -374,7 +414,7 @@ export default function RequestAccessPage() {
                   <Button 
                     type="submit" 
                     className="flex-1 h-12 text-base font-medium rounded-xl shadow-md hover:shadow-lg transition-all" 
-                    disabled={isLoading || !formData.profession}
+                    disabled={isLoading || !formData.profession || (formData.profession === "Other" && !formData.customProfession?.trim())}
                   >
                     {isLoading ? "Submitting..." : "Request Access"}
                   </Button>

@@ -5,6 +5,7 @@ const leadsValidation = require("./leads.validation");
 const validate = require("../../middleware/validate.middleware");
 
 // Leads route is public
+router.post("/validate-email", validate(leadsValidation.validateEmailValidation), leadsController.validateEmail);
 router.post("/", validate(leadsValidation.createLeadValidation), leadsController.createLead);
 
 module.exports = router;

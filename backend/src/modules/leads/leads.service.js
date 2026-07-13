@@ -5,16 +5,9 @@ const emailService = require("../emails/email.service");
 const { admin: adminConfig } = require("../../config/app.config");
 
 class LeadsService {
-  async createLead(data) {
-    const { fullName, email, country, profession, customProfession, earningsRange, previousTool, customPreviousTool } = data;
-
-    const cleanFullName = fullName.trim();
+  async validateEmail(email) {
     const cleanEmail = email.trim().toLowerCase();
     
-    // Resolve custom "Other" fields
-    const finalProfession = profession === "Other" && customProfession ? customProfession.trim() : (profession || null);
-    const finalPreviousTool = previousTool === "Other" && customPreviousTool ? customPreviousTool.trim() : (previousTool || null);
-
     // Disposable Email Check
     try {
       const isDisposable = await disposableEmailDetector(cleanEmail);
@@ -40,6 +33,22 @@ class LeadsService {
       error.status = 400;
       throw error;
     }
+    
+    return true;
+  }
+
+  async createLead(data) {
+    const { fullName, email, country, profession, customProfession, earningsRange, previousTool, customPreviousTool } = data;
+
+    const cleanFullName = fullName.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    
+    // Resolve custom "Other" fields
+    const finalProfession = profession === "Other" && customProfession ? customProfession.trim() : (profession || null);
+    const finalPreviousTool = previousTool === "Other" && customPreviousTool ? customPreviousTool.trim() : (previousTool || null);
+
+    // Call the newly extracted validation
+    await this.validateEmail(cleanEmail);
 
     const lead = await prisma.waitlistLead.create({
       data: {
