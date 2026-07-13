@@ -1,6 +1,24 @@
 // src/modules/migration/migration.service.js
 const prisma = require("../../database/prisma");
 
+const MOCK_EXCHANGE_RATES = {
+  USD: 1,
+  EUR: 1.08,
+  GBP: 1.25,
+  INR: 0.012,
+  AUD: 0.65,
+  CAD: 0.74,
+  SGD: 0.74,
+  JPY: 0.0066,
+};
+
+function getExchangeRate(fromCurrency, toCurrency) {
+  if (!fromCurrency || !toCurrency || fromCurrency === toCurrency) return 1;
+  const fromRate = MOCK_EXCHANGE_RATES[fromCurrency.toUpperCase()] || 1;
+  const toRate = MOCK_EXCHANGE_RATES[toCurrency.toUpperCase()] || 1;
+  return fromRate / toRate;
+}
+
 class MigrationService {
   async importData(organizationId, data) {
     if (!organizationId) {
@@ -10,6 +28,12 @@ class MigrationService {
     }
 
     const { clients = [], projects = [], invoices = [], payments = [], expenses = [] } = data;
+
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { masterCurrency: true },
+    });
+    const masterCurrency = org?.masterCurrency || "USD";
 
     const idMap = {
       clients: {},
@@ -91,6 +115,7 @@ class MigrationService {
               ? new Date(i.dueDate)
               : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           currency: i.currency || "USD",
+          exchangeRate: parseFloat(i.exchangeRate) || getExchangeRate(i.currency || "USD", masterCurrency),
           subtotal,
           taxAmount,
           totalAmount,
@@ -151,6 +176,7 @@ class MigrationService {
           category: e.category || "General",
           status: e.status || "Paid",
           currency: e.currency || "USD",
+          exchangeRate: parseFloat(e.exchangeRate) || getExchangeRate(e.currency || "USD", masterCurrency),
         },
       });
 
