@@ -3,8 +3,9 @@ const expensesService = require("./expenses.service");
 class ExpensesController {
   async getExpenses(req, res, next) {
     try {
-      const expenses = await expensesService.getExpenses(req.user.organizationId);
-      return res.status(200).json({ success: true, expenses });
+      const { page, limit } = req.query;
+      const result = await expensesService.getExpenses(req.user.organizationId, page, limit);
+      return res.status(200).json({ success: true, expenses: result.expenses, pagination: result.pagination });
     } catch (error) {
       if (error.status === 401) {
         return res.status(error.status).json({ success: false, message: error.message });

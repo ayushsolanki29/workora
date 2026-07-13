@@ -2,24 +2,51 @@
 const prisma = require("../../database/prisma");
 
 class ProjectsService {
-  async getProjects(organizationId, clientId, status) {
+  async getProjects(organizationId, clientId, status, page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
+    const skip = (pageNum - 1) * limitNum;
+
     const where = { organizationId };
     if (clientId) where.clientId = clientId;
     if (status && status !== "All") where.status = status;
 
+    const totalCount = await prisma.project.count({ where });
+
     const projects = await prisma.project.findMany({
       where,
-      include: { client: true },
+      skip,
+      take: limitNum,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        startDate: true,
+        estimatedEndDate: true,
+        createdAt: true,
+        client: {
+          select: { id: true, name: true, email: true }
+        }
+      },
       orderBy: { updatedAt: "desc" },
     });
 
-    return projects;
+    return {
+      projects,
+      pagination: {
+        total: totalCount,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalCount / limitNum)
+      }
+    };
   }
 
   async createProject(organizationId, data) {

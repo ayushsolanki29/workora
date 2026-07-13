@@ -3,9 +3,9 @@ const invoicesService = require("./invoices.service");
 class InvoicesController {
   async getInvoices(req, res, next) {
     try {
-      const { clientId, projectId, status } = req.query;
-      const invoices = await invoicesService.getInvoices(req.user.organizationId, clientId, projectId, status);
-      return res.status(200).json({ success: true, invoices });
+      const { clientId, projectId, status, page, limit } = req.query;
+      const result = await invoicesService.getInvoices(req.user.organizationId, clientId, projectId, status, page, limit);
+      return res.status(200).json({ success: true, invoices: result.invoices, pagination: result.pagination });
     } catch (error) {
       if (error.status === 401) {
         return res.status(error.status).json({ success: false, message: error.message });

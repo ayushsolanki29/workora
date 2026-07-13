@@ -3,15 +3,15 @@ const prisma = require("../../database/prisma");
 const crypto = require("crypto");
 
 class QuestionnairesService {
-  async getQuestionnaires(organizationId, query = "", status = "All", page = "1", limit = "10") {
+  async getQuestionnaires(organizationId, query = "", status = "All", page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
     const skip = (pageNum - 1) * limitNum;
 
     const where = {
@@ -219,15 +219,15 @@ class QuestionnairesService {
     return { success: true };
   }
 
-  async getQuestionnaireResponses(organizationId, id, page = "1", limit = "50") {
+  async getQuestionnaireResponses(organizationId, id, page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
     const skip = (pageNum - 1) * limitNum;
 
     const questionnaire = await prisma.questionnaire.findUnique({

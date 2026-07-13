@@ -103,7 +103,7 @@ app.use((error, req, res, next) => {
       success: false,
       message: error.message || "Internal server error",
       stack: error.stack,
-      error,
+      error: error.message || String(error),
     });
   } else {
     // Production Error Response (Don't leak stack trace)

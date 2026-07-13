@@ -7,8 +7,9 @@ const prisma = require("../../database/prisma");
 const { auth: authConfig } = require("../../config/app.config");
 class AuthService {
   async login(email, password) {
+    const normalizedEmail = email.trim().toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (!user || !user.passwordHash) {
@@ -75,18 +76,53 @@ class AuthService {
   }
 
   async checkEmail(email) {
+    const normalizedEmail = email.trim().toLowerCase();
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (user) {
       return { exists: true };
     } else {
       const waitlist = await prisma.waitlistLead.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       });
       return { exists: false, inWaitlist: !!waitlist };
     }
+  }
+
+  async refresh(refreshToken) {
+    if (!refreshToken) {
+      const error = new Error("No refresh token provided");
+      error.status = 401;
+      throw error;
+    }
+
+    const session = await prisma.session.findUnique({
+      where: { refreshToken },
+      include: { user: true },
+    });
+
+    if (!session || new Date() > session.expiresAt) {
+      if (session) {
+        await prisma.session.delete({ where: { id: session.id } });
+      }
+      const error = new Error("Invalid or expired refresh token");
+      error.status = 401;
+      throw error;
+    }
+
+    const payload = {
+      userId: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      hasOrg: !!session.user.organizationId,
+      organizationId: session.user.organizationId || null,
+    };
+    
+    const accessToken = jwt.sign(payload, authConfig.jwtSecret, { expiresIn: authConfig.jwtExpiresIn });
+    
+    return { accessToken };
   }
 }
 

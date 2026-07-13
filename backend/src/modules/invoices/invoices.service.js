@@ -2,25 +2,56 @@
 const prisma = require("../../database/prisma");
 
 class InvoicesService {
-  async getInvoices(organizationId, clientId, projectId, status) {
+  async getInvoices(organizationId, clientId, projectId, status, page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
+    const skip = (pageNum - 1) * limitNum;
+
     const where = { organizationId };
     if (clientId && clientId !== "All") where.clientId = clientId;
     if (projectId && projectId !== "All") where.projectId = projectId;
     if (status && status !== "All") where.status = status;
 
+    const totalCount = await prisma.invoice.count({ where });
+
     const invoices = await prisma.invoice.findMany({
       where,
-      include: { client: true, project: true },
+      skip,
+      take: limitNum,
+      select: {
+        id: true,
+        invoiceNumber: true,
+        issueDate: true,
+        dueDate: true,
+        status: true,
+        totalAmount: true,
+        paidAmount: true,
+        createdAt: true,
+        client: {
+          select: { id: true, name: true, email: true }
+        },
+        project: {
+          select: { id: true, title: true }
+        }
+      },
       orderBy: { issueDate: "desc" },
     });
 
-    return invoices;
+    return {
+      invoices,
+      pagination: {
+        total: totalCount,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalCount / limitNum)
+      }
+    };
   }
 
   async createInvoice(organizationId, data) {

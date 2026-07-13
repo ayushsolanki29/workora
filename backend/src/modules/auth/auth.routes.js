@@ -7,6 +7,7 @@ const { authMiddleware } = require("../../middleware/auth.middleware");
 
 router.post("/check-email", validate(authValidation.checkEmailValidation), authController.checkEmail);
 router.post("/login", validate(authValidation.loginValidation), authController.login);
+router.post("/refresh", authController.refresh);
 router.post("/logout", authController.logout);
 router.get("/me", authMiddleware, authController.me);
 

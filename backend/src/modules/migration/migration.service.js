@@ -9,7 +9,7 @@ class MigrationService {
       throw error;
     }
 
-    const { clients = [], projects = [], invoices = [], payments = [] } = data;
+    const { clients = [], projects = [], invoices = [], payments = [], expenses = [] } = data;
 
     const idMap = {
       clients: {},
@@ -17,15 +17,22 @@ class MigrationService {
       invoices: {},
     };
 
-    let importStats = { clients: 0, projects: 0, invoices: 0, payments: 0 };
+    let importStats = { clients: 0, projects: 0, invoices: 0, payments: 0, expenses: 0 };
 
     // 1. Import Clients
     for (const c of clients) {
-      const created = await prisma.client.create({
-        data: {
+      const emailToUse = c.email !== "this-is-blank" ? c.email : `import-${Date.now()}@temp.com`;
+      const created = await prisma.client.upsert({
+        where: { email: emailToUse },
+        update: {
+          name: c.name || "Unknown Client",
+          phone: c.phone !== "this-is-blank" ? c.phone : null,
+          status: c.status || "Active",
+        },
+        create: {
           organizationId,
           name: c.name || "Unknown Client",
-          email: c.email !== "this-is-blank" ? c.email : `import-${Date.now()}@temp.com`,
+          email: emailToUse,
           phone: c.phone !== "this-is-blank" ? c.phone : null,
           status: c.status || "Active",
         },
@@ -126,6 +133,28 @@ class MigrationService {
       });
 
       importStats.payments++;
+    }
+
+    // 5. Import Expenses
+    for (const e of expenses) {
+      const realClientId = e.clientId ? idMap.clients[e.clientId] : null;
+      const realProjectId = e.projectId ? idMap.projects[e.projectId] : null;
+
+      await prisma.expense.create({
+        data: {
+          organizationId,
+          clientId: realClientId,
+          projectId: realProjectId,
+          description: e.description || "Misc Expense",
+          amount: parseFloat(e.amount) || 0,
+          date: e.date && e.date !== "this-is-blank" ? new Date(e.date) : new Date(),
+          category: e.category || "General",
+          status: e.status || "Paid",
+          currency: e.currency || "USD",
+        },
+      });
+
+      importStats.expenses++;
     }
 
     return importStats;

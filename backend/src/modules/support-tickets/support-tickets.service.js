@@ -2,18 +2,32 @@
 const prisma = require("../../database/prisma");
 
 class SupportTicketsService {
-  async getTickets(organizationId, globalMode = false) {
+  async getTickets(organizationId, globalMode = false, page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
+    const skip = (pageNum - 1) * limitNum;
+
     const where = globalMode ? {} : { organizationId };
+
+    const totalCount = await prisma.supportTicket.count({ where });
 
     const tickets = await prisma.supportTicket.findMany({
       where,
-      include: {
+      skip,
+      take: limitNum,
+      select: {
+        id: true,
+        subject: true,
+        status: true,
+        priority: true,
+        createdAt: true,
+        updatedAt: true,
         user: { select: { name: true, email: true } },
         organization: { select: { name: true } },
         _count: { select: { messages: true } },
@@ -21,7 +35,15 @@ class SupportTicketsService {
       orderBy: { createdAt: "desc" },
     });
 
-    return tickets;
+    return {
+      tickets,
+      pagination: {
+        total: totalCount,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalCount / limitNum)
+      }
+    };
   }
 
   async createTicket(userId, organizationId, data) {

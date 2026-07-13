@@ -2,15 +2,15 @@
 const prisma = require("../../database/prisma");
 
 class ClientsService {
-  async getClients(organizationId, query = "", status = "ActiveOrLead", page = "1", limit = "10") {
+  async getClients(organizationId, query = "", status = "ActiveOrLead", page = "1", limit = "25") {
     if (!organizationId) {
       const error = new Error("Unauthorized: No organization found");
       error.status = 401;
       throw error;
     }
 
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 25));
     const skip = (pageNum - 1) * limitNum;
 
     const where = {

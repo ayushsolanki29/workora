@@ -4,8 +4,9 @@ class SupportTicketsController {
   async getTickets(req, res, next) {
     try {
       const globalMode = req.query.global === "true";
-      const tickets = await supportTicketsService.getTickets(req.user.organizationId, globalMode);
-      return res.status(200).json({ success: true, tickets });
+      const { page, limit } = req.query;
+      const result = await supportTicketsService.getTickets(req.user.organizationId, globalMode, page, limit);
+      return res.status(200).json({ success: true, tickets: result.tickets, pagination: result.pagination });
     } catch (error) {
       if (error.status === 401) {
         return res.status(error.status).json({ success: false, message: error.message });

@@ -42,6 +42,30 @@ class AuthController {
     }
   }
 
+  async refresh(req, res, next) {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+      const result = await authService.refresh(refreshToken);
+
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      };
+
+      res.cookie("accessToken", result.accessToken, cookieOptions);
+      return res.status(200).json({ success: true, accessToken: result.accessToken });
+    } catch (error) {
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      if (error.status === 401) {
+        return res.status(401).json({ success: false, message: error.message });
+      }
+      next(error);
+    }
+  }
+
   async me(req, res, next) {
     try {
       // req.user is populated by authMiddleware

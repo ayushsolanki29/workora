@@ -3,9 +3,9 @@ const projectsService = require("./projects.service");
 class ProjectsController {
   async getProjects(req, res, next) {
     try {
-      const { clientId, status } = req.query;
-      const projects = await projectsService.getProjects(req.user.organizationId, clientId, status);
-      return res.status(200).json({ success: true, projects });
+      const { clientId, status, page, limit } = req.query;
+      const result = await projectsService.getProjects(req.user.organizationId, clientId, status, page, limit);
+      return res.status(200).json({ success: true, projects: result.projects, pagination: result.pagination });
     } catch (error) {
       if (error.status === 401) {
         return res.status(error.status).json({ success: false, message: error.message });

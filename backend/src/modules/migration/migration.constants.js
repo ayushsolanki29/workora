@@ -6,6 +6,34 @@ const MIGRATION_TEMPLATE = {
       email: "billing@acmecorp.com",
       phone: "+1-555-0100",
       status: "Active"
+    },
+    {
+      id: "client-2",
+      name: "Stark Industries",
+      email: "tony@stark.com",
+      phone: "+1-555-0200",
+      status: "Active"
+    },
+    {
+      id: "client-3",
+      name: "Wayne Enterprises",
+      email: "finance@wayne.com",
+      phone: "+1-555-0300",
+      status: "Active"
+    },
+    {
+      id: "client-4",
+      name: "Cyberdyne Systems",
+      email: "accounts@cyberdyne.com",
+      phone: "+1-555-0400",
+      status: "Inactive"
+    },
+    {
+      id: "client-5",
+      name: "Umbrella Corp",
+      email: "billing@umbrella.com",
+      phone: "+1-555-0500",
+      status: "Lead"
     }
   ],
   projects: [
@@ -17,38 +45,81 @@ const MIGRATION_TEMPLATE = {
       startDate: "2026-01-15T00:00:00Z",
       estimatedEndDate: "2026-03-30T00:00:00Z",
       status: "Active"
+    },
+    {
+      id: "project-2",
+      clientId: "client-2",
+      title: "AI Automation",
+      description: "Implementing AI driven workflows",
+      startDate: "2026-02-01T00:00:00Z",
+      estimatedEndDate: "2026-05-15T00:00:00Z",
+      status: "Active"
+    },
+    {
+      id: "project-3",
+      clientId: "client-3",
+      title: "Security Audit",
+      description: "Comprehensive security audit of Wayne networks",
+      startDate: "2026-03-10T00:00:00Z",
+      estimatedEndDate: "2026-04-20T00:00:00Z",
+      status: "Completed"
+    },
+    {
+      id: "project-4",
+      clientId: "client-4",
+      title: "Legacy Migration",
+      description: "Migrating legacy systems to cloud",
+      startDate: "2025-10-01T00:00:00Z",
+      estimatedEndDate: "2025-12-31T00:00:00Z",
+      status: "Completed"
+    },
+    {
+      id: "project-5",
+      clientId: "client-5",
+      title: "Market Research",
+      description: "Q3 Market analysis and competitor research",
+      startDate: "2026-05-01T00:00:00Z",
+      estimatedEndDate: "2026-07-31T00:00:00Z",
+      status: "Active"
     }
   ],
-  invoices: [
-    {
-      id: "invoice-1",
-      clientId: "client-1",
-      projectId: "project-1",
-      invoiceNumber: "INV-2026-001",
-      status: "Paid",
-      issueDate: "2026-02-15T00:00:00Z",
-      dueDate: "2026-03-15T00:00:00Z",
-      currency: "USD",
-      items: [
-        {
-          description: "UI/UX Design Phase",
-          quantity: 1,
-          unitPrice: 5000,
-          taxRate: 10
-        }
-      ]
-    }
-  ],
-  payments: [
-    {
-      id: "payment-1",
-      invoiceId: "invoice-1",
-      amount: 5500,
-      date: "2026-02-28T00:00:00Z",
-      method: "Bank Transfer",
-      reference: "TXN-987654321"
-    }
-  ]
+  invoices: Array.from({ length: 12 }).map((_, i) => ({
+    id: `invoice-${i + 1}`,
+    clientId: `client-${(i % 5) + 1}`,
+    projectId: `project-${(i % 5) + 1}`,
+    invoiceNumber: `INV-2026-${String(i + 1).padStart(3, '0')}`,
+    status: "Paid",
+    issueDate: `2026-${String(i + 1).padStart(2, '0')}-01T00:00:00Z`,
+    dueDate: `2026-${String(i + 1).padStart(2, '0')}-15T00:00:00Z`,
+    currency: "USD",
+    items: [
+      {
+        description: "Monthly Service Retainer",
+        quantity: 1,
+        unitPrice: 2000 + (Math.sin(i / 2) * 1500) + (i * 500), // Creates a nice curve
+        taxRate: 10
+      }
+    ]
+  })),
+  payments: Array.from({ length: 12 }).map((_, i) => ({
+    id: `payment-${i + 1}`,
+    invoiceId: `invoice-${i + 1}`,
+    amount: (2000 + (Math.sin(i / 2) * 1500) + (i * 500)) * 1.1, // matches invoice total with tax
+    date: `2026-${String(i + 1).padStart(2, '0')}-10T00:00:00Z`,
+    method: "Bank Transfer",
+    reference: `TXN-${2026000 + i}`
+  })),
+  expenses: Array.from({ length: 12 }).map((_, i) => ({
+    id: `expense-${i + 1}`,
+    clientId: `client-${(i % 5) + 1}`,
+    projectId: `project-${(i % 5) + 1}`,
+    description: "Infrastructure & Software Services",
+    amount: 1000 + (Math.sin(i / 2) * 400) + (i * 150),
+    date: `2026-${String(i + 1).padStart(2, '0')}-15T00:00:00Z`,
+    category: "Software",
+    status: "Paid",
+    currency: "USD"
+  }))
 };
 
 const AI_PROMPT = `You are an expert data migration assistant and structural parser. Your task is to extract unstructured or semi-structured data from the provided context (which may include PDFs, Excel spreadsheets, CSVs, or messy text) and cleanly transform it into a strict JSON payload matching the target schema.
