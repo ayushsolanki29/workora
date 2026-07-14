@@ -1,6 +1,9 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import GlobeDemo from "@/components/globe-demo";
 import { TrendingUpIcon, SquareMousePointerIcon, GlobeIcon } from "lucide-react";
+import { motion } from "motion/react";
 
 const features = [
 	{
@@ -32,14 +35,18 @@ const features = [
 
 export function FeatureSection() {
 	return (
-        <div
+        <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
             className="relative mx-auto grid w-full max-w-5xl grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-6">
             {features.map((feature) => (
 				<FeatureCard className={feature.className} key={feature.id}>
 					{feature.children}
 				</FeatureCard>
 			))}
-        </div>
+        </motion.div>
     );
 }
 

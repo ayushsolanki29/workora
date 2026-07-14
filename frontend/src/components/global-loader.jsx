@@ -8,7 +8,11 @@ export function GlobalLoader() {
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
+  // We use this to prevent hydration mismatch with motion components
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     // Simulate loading progress
     const duration = 1500;
     const interval = 30;
@@ -22,21 +26,42 @@ export function GlobalLoader() {
 
       if (currentStep >= steps) {
         clearInterval(timer);
-        setTimeout(() => setIsLoading(false), 200);
+        setTimeout(() => setIsLoading(false), 300);
       }
     }, interval);
 
     return () => clearInterval(timer);
   }, []);
 
+  if (!mounted) {
+    // Return a static version for SSR to ensure it blocks the screen immediately
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#f3f8ff]">
+        <div className="flex flex-col items-center gap-6">
+          <div>
+            <Logo className="w-16 h-16 text-blue-600" />
+          </div>
+          <div className="w-48 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+             <div className="h-full bg-blue-600 rounded-full w-0" />
+          </div>
+          <div className="text-[11px] font-bold text-slate-400 tracking-widest uppercase">
+            Loading Soseki...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AnimatePresence>
       {isLoading && (
         <motion.div
+          key="global-loader"
           initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#f3f8ff]"
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#f3f8ff]"
         >
           <div className="flex flex-col items-center gap-6">
             <motion.div

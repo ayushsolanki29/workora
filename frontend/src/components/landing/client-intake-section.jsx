@@ -1,9 +1,18 @@
+"use client";
+
 import { Sparkles, FileText, Link2, Copy } from "lucide-react";
+import { motion } from "motion/react";
 
 export function ClientIntakeSection() {
   return (
-    <section className="bg-slate-50 py-24 border-b border-slate-100">
-      <div className="max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
+    <section className="bg-slate-50 py-24 border-b border-slate-100 overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7 }}
+        className="max-w-5xl mx-auto px-6 flex flex-col items-center text-center"
+      >
         <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5">
           Client intake on <span className="text-blue-600">autopilot</span>
         </h2>
@@ -86,7 +95,7 @@ export function ClientIntakeSection() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
