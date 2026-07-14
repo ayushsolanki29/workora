@@ -1,6 +1,9 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { FullWidthDivider } from "@/components/full-width-divider";
 import { ArrowRightIcon } from "lucide-react";
+import { DynamicTime } from "@/components/dynamic-time";
 
 export function CallToAction() {
 	return (
@@ -9,7 +12,7 @@ export function CallToAction() {
             <FullWidthDivider className="-top-px" />
             <div className="border-b px-2 py-16">
 				<h2 className="text-center font-bold text-3xl md:text-5xl">
-					Set up in 10 mins.<br/>Back to building by 4:49pm.
+					Set up in 10 mins.<br/>Back to building by <DynamicTime offsetMinutes={10} />.
 				</h2>
 				<p
                     className="text-balance text-center text-muted-foreground text-sm md:text-base mt-4">
