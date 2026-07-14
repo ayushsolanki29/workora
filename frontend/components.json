@@ -23,6 +23,7 @@
   },
   "registries": {
     "@efferd": "https://efferd.com/r/{style}/{name}.json",
-    "@magicui": "https://magicui.design/r/{name}"
+    "@magicui": "https://magicui.design/r/{name}",
+    "@aceternity": "https://ui.aceternity.com/registry/{name}.json"
   }
 }

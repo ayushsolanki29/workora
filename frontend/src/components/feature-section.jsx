@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CobeGlobe } from "@/components/cobe-globe";
+import GlobeDemo from "@/components/globe-demo";
 import { TrendingUpIcon, SquareMousePointerIcon, GlobeIcon } from "lucide-react";
 
 const features = [
@@ -200,8 +200,8 @@ function PresenceVisual() {
 					</FeatureDescription>
 				</div>
 			</div>
-            <div className="relative min-h-[250px]">
-				<CobeGlobe className="top-[28%] right-0 sm:absolute sm:right-[-10%]" />
+			<div className="relative min-h-[300px]">
+				<GlobeDemo className="absolute w-[500px] h-[500px] top-[10%] right-[-50%] sm:right-[-70%] md:right-[-80%] pointer-events-none" />
 			</div>
         </div>
     );
