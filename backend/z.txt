@@ -8,4 +8,4 @@ npm run db:seed
 npm run dev
 
 # Open Prisma Studio to view data
-npm run db:studio
+npm run db:studio  sdfsf
