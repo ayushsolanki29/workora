@@ -18,7 +18,9 @@ class TrackingController {
     };
 
     // We do NOT await this so the thread is not blocked
-    trackingService.trackVisit(data);
+    if (!data.path || !data.path.startsWith("/super-admin")) {
+      trackingService.trackVisit(data);
+    }
   }
 }
 

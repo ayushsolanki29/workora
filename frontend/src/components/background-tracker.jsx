@@ -11,6 +11,12 @@ export function BackgroundTracker() {
   useEffect(() => {
     // Only track the very first page load of the session to avoid spamming
     if (tracked.current) return;
+    
+    // Do not track super-admin routes
+    if (pathname && pathname.startsWith("/super-admin")) {
+      return;
+    }
+
     tracked.current = true;
 
     // We use setTimeout to push this to the end of the event loop
