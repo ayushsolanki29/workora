@@ -1,5 +1,8 @@
-import { serverFetch } from "@/lib/server-api";
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import API from "@/lib/api";
+import { notFound, useParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Users, FileText, Briefcase, Receipt, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -8,16 +11,38 @@ import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { OrgActions } from "./org-actions";
 import { formatDate } from "@/lib/utils";
 
-export default async function OrganizationDetailsPage({ params }) {
-  const { id } = await params;
+export default function OrganizationDetailsPage() {
+  const params = useParams();
+  const id = params.id;
   
-  let org = null;
-  try {
-    const data = await serverFetch(`/super-admin/organizations/${id}`);
-    org = data.organization;
-  } catch (error) {
-    if (error.status === 404) notFound();
-    console.error("Failed to fetch organization:", error);
+  const [org, setOrg] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchOrg = async () => {
+      try {
+        const res = await API.get(`/super-admin/organizations/${id}`);
+        setOrg(res.data.organization);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          // notFound() is for server components mostly, but let's just leave it or redirect
+          console.error("Not found");
+        }
+        console.error("Failed to fetch organization:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrg();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   if (!org) return null;

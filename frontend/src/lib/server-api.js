@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_BASE_URL = (process.env.NEXT_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050/api').replace('localhost', '127.0.0.1');
 
 export async function serverFetch(endpoint, options = {}) {
   // In Next.js 15, cookies() is asynchronous
@@ -15,6 +15,7 @@ export async function serverFetch(endpoint, options = {}) {
     ...(options.headers || {})
   };
 
+  console.log(`[serverFetch] hitting: ${API_BASE_URL}${endpoint}`);
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,

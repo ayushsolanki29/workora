@@ -1,4 +1,7 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState } from "react";
+import API from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -12,13 +15,30 @@ import { formatDate } from "@/lib/utils";
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminAccessRequestsPage() {
-  let requests = [];
-  try {
-    const data = await serverFetch("/super-admin/access-requests");
-    requests = data.requests || [];
-  } catch (error) {
-    console.error("Failed to fetch access requests:", error);
+export default function SuperAdminAccessRequestsPage() {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await API.get("/super-admin/access-requests");
+        setRequests(res.data.requests || []);
+      } catch (error) {
+        console.error("Failed to fetch access requests:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRequests();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (

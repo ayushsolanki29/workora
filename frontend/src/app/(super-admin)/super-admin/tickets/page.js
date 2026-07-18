@@ -1,4 +1,7 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState } from "react";
+import API from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -14,13 +17,30 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminTicketsPage() {
-  let tickets = [];
-  try {
-    const data = await serverFetch("/super-admin/tickets");
-    tickets = data.tickets || [];
-  } catch (error) {
-    console.error("Failed to fetch tickets:", error);
+export default function SuperAdminTicketsPage() {
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const res = await API.get("/super-admin/tickets");
+        setTickets(res.data.tickets || []);
+      } catch (error) {
+        console.error("Failed to fetch tickets:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTickets();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (

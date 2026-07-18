@@ -1,4 +1,7 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState } from "react";
+import API from "@/lib/api";
 import {
   Table,
   TableBody,
@@ -17,13 +20,30 @@ import { Button } from "@/components/ui/button";
 
 export const dynamic = 'force-dynamic';
 
-export default async function SuperAdminOrganizationsPage() {
-  let organizations = [];
-  try {
-    const data = await serverFetch("/super-admin/organizations");
-    organizations = data.organizations || [];
-  } catch (error) {
-    console.error("Failed to fetch organizations:", error);
+export default function SuperAdminOrganizationsPage() {
+  const [organizations, setOrganizations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        const res = await API.get("/super-admin/organizations");
+        setOrganizations(res.data.organizations || []);
+      } catch (error) {
+        console.error("Failed to fetch organizations:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrganizations();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
