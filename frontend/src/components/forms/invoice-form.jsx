@@ -73,8 +73,8 @@ export function InvoiceForm({ initialData = null }) {
     const fetchSelectData = async () => {
       try {
         const [clientsRes, projectsRes, orgRes, quickRes] = await Promise.all([
-          API.get("/clients"),
-          API.get("/projects"),
+          API.get("/clients?limit=1000&status=All"),
+          API.get("/projects?limit=1000&status=All"),
           API.get("/organization"),
           API.get("/quick-items")
         ]);
@@ -283,18 +283,14 @@ export function InvoiceForm({ initialData = null }) {
                     />
                 </div>
                 <Select 
-                    value={formData.clientId} 
+                    value={formData.clientId || "Select Client..."} 
                     onValueChange={(val) => setFormData({...formData, clientId: val})}
-                    items={[
-                        { value: "placeholder", label: "Select Client..." },
-                        ...clients.map(c => ({ value: c.id, label: c.name }))
-                    ]}
                 >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Client" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="placeholder" disabled>Select Client...</SelectItem>
+                        <SelectItem value="Select Client..." disabled>Select Client...</SelectItem>
                         {clients.map(client => (
                             <SelectItem key={client.id} value={client.id}>{client.name}</SelectItem>
                         ))}
@@ -313,41 +309,41 @@ export function InvoiceForm({ initialData = null }) {
                         }
                         onSuccess={(project) => {
                             setProjects([project, ...projects]);
-                            setFormData({...formData, projectId: project.id});
+                            setFormData({...formData, projectId: project.id, clientId: project.clientId || project.client?.id});
                         }}
                     />
                 </div>
                 <Select 
-                    value={formData.projectId} 
+                    value={formData.projectId || "none"} 
                     onValueChange={(val) => {
-                        if (val === "none") {
+                        if (val === "none" || val === "Select Client...") {
                             setFormData({...formData, projectId: ""});
                             return;
                         }
                         const proj = projects.find(p => p.id === val);
                         if (proj) {
-                            setFormData({...formData, projectId: val, clientId: proj.clientId});
+                            setFormData({...formData, projectId: val, clientId: proj.clientId || proj.client?.id});
                         }
                     }}
-                    items={[
-                        { value: "placeholder", label: "Select Project..." },
-                        { value: "none", label: "None" },
-                        ...projects
-                            .filter(p => p && (!formData.clientId || p.clientId === formData.clientId))
-                            .map(p => ({ value: p.id, label: p.title }))
-                    ]}
                 >
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Project (Optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="placeholder" disabled>Select Project...</SelectItem>
-                        <SelectItem value="none">None</SelectItem>
-                        {projects
-                            .filter(p => p && (!formData.clientId || p.clientId === formData.clientId))
-                            .map(project => (
-                                <SelectItem key={project.id} value={project.id}>{project.title}</SelectItem>
-                            ))}
+                        {(!formData.clientId || formData.clientId === "Select Client...") ? (
+                            <SelectItem value="Select Client..." disabled>Select a client first...</SelectItem>
+                        ) : projects.filter(p => (p.clientId || p.client?.id) === formData.clientId).length === 0 ? (
+                            <SelectItem value="none">No projects for this client</SelectItem>
+                        ) : (
+                            <>
+                                <SelectItem value="none">None</SelectItem>
+                                {projects
+                                    .filter(p => (p.clientId || p.client?.id) === formData.clientId)
+                                    .map(project => (
+                                        <SelectItem key={project.id} value={project.id}>{project.title}</SelectItem>
+                                    ))}
+                            </>
+                        )}
                     </SelectContent>
                 </Select>
             </div>
