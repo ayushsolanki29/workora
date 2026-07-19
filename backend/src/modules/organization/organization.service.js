@@ -194,6 +194,46 @@ class OrganizationService {
 
     return requests;
   }
+
+  async exportOrganizationData(organizationId) {
+    if (!organizationId) {
+      const error = new Error("Unauthorized");
+      error.status = 401;
+      throw error;
+    }
+
+    const data = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      include: {
+        users: { select: { id: true, email: true, name: true, createdAt: true } },
+        clients: true,
+        projects: true,
+        invoices: { include: { items: true, payments: true } },
+        expenses: true,
+        questionnaires: { include: { fields: true, responses: true } }
+      }
+    });
+
+    if (!data) {
+      const error = new Error("Organization not found");
+      error.status = 404;
+      throw error;
+    }
+
+    return data;
+  }
+
+  async deleteOrganization(organizationId) {
+    if (!organizationId) {
+      const error = new Error("Unauthorized");
+      error.status = 401;
+      throw error;
+    }
+
+    await prisma.organization.delete({
+      where: { id: organizationId }
+    });
+  }
 }
 
 module.exports = new OrganizationService();
