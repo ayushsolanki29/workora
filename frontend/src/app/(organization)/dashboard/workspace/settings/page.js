@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import API from "@/lib/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CurrencyGrid } from "@/components/ui/currency-grid";
 
 export default function WorkspaceSettingsPage() {
   const [name, setName] = useState("");
@@ -200,8 +201,6 @@ export default function WorkspaceSettingsPage() {
     );
   }
 
-  const currencies = ["USD", "EUR", "GBP", "INR", "CAD", "AUD", "JPY"];
-
   return (
     <div className="p-8 max-w-4xl flex flex-col gap-8 pb-20">
       <div>
@@ -320,16 +319,13 @@ export default function WorkspaceSettingsPage() {
                 <div className="space-y-2">
                     <div className="font-semibold text-sm">Master Currency</div>
                     <div className="text-xs text-muted-foreground mb-2">Your system-wide base currency for reporting.</div>
-                    <Select value={masterCurrency} onValueChange={setMasterCurrency} disabled={isSavingCurrency || hasTransactions}>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Select Currency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {currencies.map(currency => (
-                                <SelectItem key={currency} value={currency}>{currency}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <div className="mt-2">
+                        <CurrencyGrid 
+                          value={masterCurrency} 
+                          onChange={setMasterCurrency} 
+                          disabled={isSavingCurrency || hasTransactions} 
+                        />
+                    </div>
                     {hasTransactions && (
                         <p className="text-xs text-amber-600 font-medium">
                             Currency is locked because you have existing financial transactions.

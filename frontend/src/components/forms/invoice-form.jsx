@@ -25,10 +25,12 @@ import {
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PlusIcon, TrashIcon, ZapIcon, SparklesIcon, SaveIcon, PlusCircleIcon } from "lucide-react";
+import { fetchExchangeRate } from "@/lib/exchange";
+import { CURRENCIES } from "@/lib/currencies";
+import { formatCurrency } from "@/lib/utils";
 import API from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@/lib/utils";
 import { CreateClientDialog } from "./create-client-dialog";
 import { CreateProjectDialog } from "./create-project-dialog";
 
@@ -50,6 +52,7 @@ export function InvoiceForm({ initialData = null }) {
   const [isQuickOpen, setIsQuickOpen] = useState(false);
 
   // Form State
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     clientId: initialData?.clientId || "",
     projectId: initialData?.projectId || "",
@@ -107,11 +110,8 @@ export function InvoiceForm({ initialData = null }) {
           }
           setIsFetchingRate(true);
           try {
-              const res = await fetch(`https://open.er-api.com/v6/latest/${formData.currency}`);
-              const data = await res.json();
-              if (data && data.rates && data.rates[masterCurrency]) {
-                  setExchangeRate(data.rates[masterCurrency]);
-              }
+              const rate = await fetchExchangeRate(formData.currency, masterCurrency);
+              setExchangeRate(rate);
           } catch (e) {
               console.error("Failed to fetch exchange rate", e);
           } finally {
@@ -196,10 +196,24 @@ export function InvoiceForm({ initialData = null }) {
   const tax = parseFloat(formData.taxAmount) || 0; // Simple flat tax for demo
   const grandTotal = subtotal - discount + tax;
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.clientId || formData.clientId === "Select Client...") newErrors.clientId = "Client is required";
+    if (!formData.invoiceNumber || !formData.invoiceNumber.trim()) newErrors.invoiceNumber = "Invoice Number is required";
+    if (!formData.issueDate) newErrors.issueDate = "Issue Date is required";
+    if (!formData.dueDate) {
+      newErrors.dueDate = "Due Date is required";
+    } else if (formData.issueDate && new Date(formData.dueDate) < new Date(formData.issueDate)) {
+      newErrors.dueDate = "Due Date cannot be before Issue Date";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e, submitStatus) => {
     e.preventDefault();
-    if (!formData.clientId || !formData.dueDate) {
-        toast.error("Please fill in Client and Due Date");
+    if (!validate()) {
+        toast.error("Please fix the errors before submitting");
         return;
     }
 
@@ -284,10 +298,17 @@ export function InvoiceForm({ initialData = null }) {
                 </div>
                 <Select 
                     value={formData.clientId || "Select Client..."} 
-                    onValueChange={(val) => setFormData({...formData, clientId: val})}
+                    onValueChange={(val) => {
+                        setFormData({...formData, clientId: val});
+                        if (errors.clientId) setErrors({...errors, clientId: null});
+                    }}
                 >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Client" />
+                    <SelectTrigger className={`w-full ${errors.clientId ? 'border-destructive focus:ring-destructive aria-invalid:border-destructive aria-invalid:ring-destructive/20' : ''}`}>
+                        <SelectValue placeholder="Select Client">
+                            {formData.clientId !== "Select Client..." && formData.clientId 
+                                ? (clients.find(c => c.id === formData.clientId)?.name || formData.clientId) 
+                                : "Select Client..."}
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="Select Client..." disabled>Select Client...</SelectItem>
@@ -296,6 +317,7 @@ export function InvoiceForm({ initialData = null }) {
                         ))}
                     </SelectContent>
                 </Select>
+                {errors.clientId && <p className="text-xs text-destructive -mt-1">{errors.clientId}</p>}
             </div>
             
             <div className="flex flex-col gap-3">
@@ -327,7 +349,11 @@ export function InvoiceForm({ initialData = null }) {
                     }}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Project (Optional)" />
+                        <SelectValue placeholder="Select Project (Optional)">
+                            {formData.projectId !== "none" && formData.projectId 
+                                ? (projects.find(p => p.id === formData.projectId)?.title || formData.projectId) 
+                                : "Select Project (Optional)"}
+                        </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                         {(!formData.clientId || formData.clientId === "Select Client...") ? (
@@ -348,9 +374,12 @@ export function InvoiceForm({ initialData = null }) {
                 </Select>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 relative">
                 <label className="text-sm font-semibold text-foreground">Invoice Number *</label>
-                <Input value={formData.invoiceNumber} onChange={e => setFormData({...formData, invoiceNumber: e.target.value})} />
+                <div>
+                    <Input value={formData.invoiceNumber} onChange={e => { setFormData({...formData, invoiceNumber: e.target.value}); if (errors.invoiceNumber) setErrors({...errors, invoiceNumber: null}); }} className={errors.invoiceNumber ? "border-destructive focus-visible:ring-destructive" : ""} />
+                    {errors.invoiceNumber && <p className="text-xs text-destructive mt-1.5">{errors.invoiceNumber}</p>}
+                </div>
             </div>
             
             <div className="flex flex-col gap-3">
@@ -358,26 +387,19 @@ export function InvoiceForm({ initialData = null }) {
                 <Select 
                     value={formData.currency} 
                     onValueChange={(val) => setFormData({...formData, currency: val})}
-                    items={[
-                        { value: "USD", label: "USD" },
-                        { value: "EUR", label: "EUR" },
-                        { value: "GBP", label: "GBP" },
-                        { value: "INR", label: "INR" },
-                        { value: "AUD", label: "AUD" },
-                        { value: "CAD", label: "CAD" },
-                        { value: "SGD", label: "SGD" },
-                    ]}
                 >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-11">
                         <SelectValue placeholder="USD" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="USD">USD ($)</SelectItem>
-                        <SelectItem value="EUR">EUR (€)</SelectItem>
-                        <SelectItem value="GBP">GBP (£)</SelectItem>
-                        <SelectItem value="INR">INR (₹)</SelectItem>
-                        <SelectItem value="CAD">CAD ($)</SelectItem>
-                        <SelectItem value="AUD">AUD ($)</SelectItem>
+                        {CURRENCIES.map(c => (
+                            <SelectItem key={c.code} value={c.code}>
+                                <div className="flex items-center gap-2">
+                                    <img src={`https://flagcdn.com/w20/${c.country}.png`} alt={c.code} className="w-4 h-3 object-cover rounded shadow-sm" />
+                                    <span>{c.code} ({c.symbol})</span>
+                                </div>
+                            </SelectItem>
+                        ))}
                     </SelectContent>
                 </Select>
                 {formData.currency !== masterCurrency && (
@@ -387,14 +409,20 @@ export function InvoiceForm({ initialData = null }) {
                 )}
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 relative">
                 <label className="text-sm font-semibold text-foreground">Issue Date *</label>
-                <Input type="date" value={formData.issueDate} onChange={e => setFormData({...formData, issueDate: e.target.value})} />
+                <div>
+                    <Input type="date" value={formData.issueDate} onChange={e => { setFormData({...formData, issueDate: e.target.value}); if (errors.issueDate) setErrors({...errors, issueDate: null}); }} className={errors.issueDate ? "border-destructive focus-visible:ring-destructive" : ""} />
+                    {errors.issueDate && <p className="text-xs text-destructive mt-1.5">{errors.issueDate}</p>}
+                </div>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 relative">
                 <label className="text-sm font-semibold text-foreground">Due Date *</label>
-                <Input type="date" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} />
+                <div>
+                    <Input type="date" value={formData.dueDate} min={formData.issueDate} onChange={e => { setFormData({...formData, dueDate: e.target.value}); if (errors.dueDate) setErrors({...errors, dueDate: null}); }} className={errors.dueDate ? "border-destructive focus-visible:ring-destructive" : ""} />
+                    {errors.dueDate && <p className="text-xs text-destructive mt-1.5">{errors.dueDate}</p>}
+                </div>
             </div>
         </div>
 
@@ -449,44 +477,43 @@ export function InvoiceForm({ initialData = null }) {
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center gap-3">
-                <Button variant="outline" className="w-fit gap-2" onClick={handleAddItem}>
+            <div className="flex flex-wrap items-center gap-3">
+                <Button variant="outline" className="w-fit gap-2 shrink-0" onClick={handleAddItem}>
                     <PlusIcon className="size-4" /> Add Item
                 </Button>
                 
+                {quickItems.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2 border-l pl-3 ml-1">
+                        {quickItems.map(qi => (
+                            <button 
+                                key={qi.id} 
+                                type="button"
+                                onClick={() => handleQuickAdd(qi)}
+                                className="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors border border-primary/20 shadow-sm"
+                                title={`Click to add ${qi.name} for ${formatCurrency(qi.defaultPrice, masterCurrency)}`}
+                            >
+                                <SparklesIcon className="size-3 text-amber-500" />
+                                {qi.name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 <Popover open={isQuickOpen} onOpenChange={setIsQuickOpen}>
-                    <PopoverTrigger render={<Button variant="secondary" className="w-fit gap-2 bg-primary/10 text-primary hover:bg-primary/20 border-primary/20" />}>
-                        <SparklesIcon className="size-4" /> Quick Add Services
+                    <PopoverTrigger render={<Button variant="secondary" size="sm" className={`w-fit gap-1 rounded-full px-3 h-7 text-xs ${quickItems.length === 0 ? "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20" : "bg-muted text-muted-foreground hover:bg-muted/80"}`} />}>
+                        <PlusIcon className="size-3" /> {quickItems.length === 0 ? "Create Quick Add" : "New"}
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 p-0" align="start">
+                    <PopoverContent className="w-72 p-0" align="start">
                         <div className="p-4 border-b bg-muted/20">
                             <h4 className="font-medium text-sm flex items-center gap-2">
                                 <ZapIcon className="size-4 text-amber-500 fill-amber-500" />
-                                Saved Services
+                                Save a Service
                             </h4>
-                            <p className="text-xs text-muted-foreground mt-1">Add items faster! Select a saved service below or create a new one instantly.</p>
-                        </div>
-                        
-                        <div className="max-h-[200px] overflow-y-auto p-2">
-                            {quickItems.length === 0 ? (
-                                <p className="text-xs text-center text-muted-foreground py-4">No saved services yet.</p>
-                            ) : (
-                                quickItems.map(qi => (
-                                    <button 
-                                        key={qi.id} 
-                                        onClick={() => handleQuickAdd(qi)}
-                                        className="w-full text-left flex items-center justify-between p-2 text-sm hover:bg-muted rounded-md transition-colors"
-                                    >
-                                        <span className="font-medium truncate pr-2">{qi.name}</span>
-                                        <span className="text-muted-foreground shrink-0">{formatCurrency(qi.defaultPrice, masterCurrency)}</span>
-                                    </button>
-                                ))
-                            )}
+                            <p className="text-xs text-muted-foreground mt-1">Save a frequently used service here to reuse it instantly on future invoices.</p>
                         </div>
 
-                        <div className="p-3 border-t bg-muted/20">
-                            <form onSubmit={handleCreateQuickItem} className="flex flex-col gap-2">
-                                <p className="text-xs font-medium mb-1">Create New</p>
+                        <div className="p-3 bg-card">
+                            <form onSubmit={handleCreateQuickItem} className="flex flex-col gap-3">
                                 <Input 
                                     size="sm" 
                                     className="h-8 text-xs" 
@@ -503,7 +530,7 @@ export function InvoiceForm({ initialData = null }) {
                                         value={newQuickItemPrice} 
                                         onChange={e => setNewQuickItemPrice(e.target.value)} 
                                     />
-                                    <Button type="submit" size="sm" className="h-8 shrink-0" disabled={isCreatingQuickItem || !newQuickItemName}>
+                                    <Button type="submit" size="sm" className="h-8 shrink-0 w-20" disabled={isCreatingQuickItem || !newQuickItemName}>
                                         <SaveIcon className="size-3 mr-1" /> Save
                                     </Button>
                                 </div>

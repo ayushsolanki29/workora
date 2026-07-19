@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import { fetchExchangeRate } from "@/lib/exchange";
+import { CURRENCIES } from "@/lib/currencies";
 
 export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvoiceId, expenseToEdit }) {
   const [formData, setFormData] = useState({
@@ -97,11 +99,8 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
           }
           setIsFetchingRate(true);
           try {
-              const res = await fetch(`https://open.er-api.com/v6/latest/${formData.currency}`);
-              const data = await res.json();
-              if (data && data.rates && data.rates[masterCurrency]) {
-                  setExchangeRate(data.rates[masterCurrency]);
-              }
+              const rate = await fetchExchangeRate(formData.currency, masterCurrency);
+              setExchangeRate(rate);
           } catch (e) {
               console.error("Failed to fetch exchange rate", e);
           } finally {
@@ -176,14 +175,18 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
             <Select 
               value={formData.currency} 
               onValueChange={val => setFormData({...formData, currency: val})}
-              items={["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "INR"].map(c => ({ value: c, label: c }))}
             >
                 <SelectTrigger>
                     <SelectValue placeholder="Select Currency" />
                 </SelectTrigger>
                 <SelectContent>
-                    {["USD", "EUR", "GBP", "JPY", "CAD", "AUD", "INR"].map(cur => (
-                        <SelectItem key={cur} value={cur}>{cur}</SelectItem>
+                    {CURRENCIES.map(c => (
+                        <SelectItem key={c.code} value={c.code}>
+                            <div className="flex items-center gap-2">
+                                <img src={`https://flagcdn.com/w20/${c.country}.png`} alt={c.code} className="w-4 h-3 object-cover rounded-sm shadow-sm" />
+                                <span>{c.code} ({c.symbol})</span>
+                            </div>
+                        </SelectItem>
                     ))}
                 </SelectContent>
             </Select>
