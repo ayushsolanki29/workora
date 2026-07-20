@@ -27,8 +27,8 @@ class SuperAdminService {
       throw error;
     }
 
-    // If 2FA is enabled, do not generate accessToken yet
-    if (user.isTwoFactorEnabled) {
+    // If 2FA is enabled, do not generate accessToken yet (ignore in local env)
+    if (user.isTwoFactorEnabled && process.env.NODE_ENV !== "development") {
       const tempPayload = { userId: user.id, type: "superadmin-temp" };
       const tempToken = jwt.sign(tempPayload, authConfig.jwtSecret, { expiresIn: '15m' });
       return {
