@@ -1,19 +1,37 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState, use } from "react";
+import API from "@/lib/api";
 import Link from "next/link";
 import { ArrowLeft, Calendar, FileText, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { format } from "date-fns";
 
-export default async function ClientPortalProject({ params }) {
-  const { clientId, projectId } = await params;
+export default function ClientPortalProject({ params }) {
+  const { clientId, projectId } = use(params);
 
-  let project = null;
+  const [project, setProject] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  try {
-    const res = await serverFetch(`/portal/client/${clientId}/projects/${projectId}`);
-    project = res.data;
-  } catch (error) {
+  useEffect(() => {
+    API.get(`/portal/client/${clientId}/projects/${projectId}`)
+      .then(res => {
+        setProject(res.data.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setError(true);
+        setIsLoading(false);
+      });
+  }, [clientId, projectId]);
+
+  if (isLoading) {
+    return <div className="py-20 text-center text-slate-500">Loading project...</div>;
+  }
+
+  if (error || !project) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Project Not Found</h2>

@@ -1,11 +1,27 @@
+"use client";
+
 import { Inter } from "next/font/google";
-import { Header } from "@/components/header"; // Might need a custom portal header if the main one is tied to auth
+import { Header } from "@/components/header"; 
 import Link from "next/link";
-import { Home, Briefcase, FileText, ArrowLeft } from "lucide-react";
+import { Home, Briefcase, FileText } from "lucide-react";
+import API from "@/lib/api";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
+import { LogoIcon } from "@/components/logo";
+import { useEffect, useState, use } from "react";
 
 // For the portal, we should use a clean, standalone layout
 export default function ClientPortalLayout({ children, params }) {
-  const { clientId } = params;
+  const { clientId } = use(params);
+
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    API.get(`/portal/client/${clientId}`)
+      .then(res => setProfile(res.data.data))
+      .catch(err => {
+        // silently fail, the page will handle the error
+      });
+  }, [clientId]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -13,8 +29,16 @@ export default function ClientPortalLayout({ children, params }) {
       <header className="sticky top-0 z-40 w-full border-b bg-white backdrop-blur">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
           <div className="flex gap-6 md:gap-10">
-            <Link href={`/c/${clientId}`} className="flex items-center space-x-2">
-              <span className="inline-block font-bold text-xl text-slate-800">Client Portal</span>
+            <Link href={`/c/${clientId}`} className="flex items-center space-x-3">
+              <LogoIcon className="size-6 text-primary" />
+              <span className="inline-block font-bold text-xl text-slate-800">
+                {profile?.organization?.name || "Client Portal"}
+              </span>
+              <span className="text-slate-300">|</span>
+              <div className="flex items-center space-x-2 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full hover:bg-slate-200 transition-colors" title={profile?.name}>
+                <DynamicAvatar type="client" seed={profile?.name} size={24} />
+                <span className="hidden sm:inline-block max-w-[120px] truncate">{profile?.name || "Profile"}</span>
+              </div>
             </Link>
           </div>
           <nav className="flex items-center space-x-4 md:space-x-8 text-sm font-medium text-slate-600">

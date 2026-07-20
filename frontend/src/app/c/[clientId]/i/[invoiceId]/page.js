@@ -1,20 +1,37 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState, use } from "react";
+import API from "@/lib/api";
 import Link from "next/link";
 import { ArrowLeft, Download, CreditCard, Building, Building2, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+export default function ClientPortalInvoice({ params }) {
+  const { clientId, invoiceId } = use(params);
 
-export default async function ClientPortalInvoice({ params }) {
-  const { clientId, invoiceId } = await params;
+  const [invoice, setInvoice] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  let invoice = null;
+  useEffect(() => {
+    API.get(`/portal/client/${clientId}/invoices/${invoiceId}`)
+      .then(res => {
+        setInvoice(res.data.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setError(true);
+        setIsLoading(false);
+      });
+  }, [clientId, invoiceId]);
 
-  try {
-    const res = await serverFetch(`/portal/client/${clientId}/invoices/${invoiceId}`);
-    invoice = res.data;
-  } catch (error) {
+  if (isLoading) {
+    return <div className="py-20 text-center text-slate-500">Loading invoice...</div>;
+  }
+
+  if (error || !invoice) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Invoice Not Found</h2>

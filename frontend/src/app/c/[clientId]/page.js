@@ -1,28 +1,47 @@
-import { serverFetch } from "@/lib/server-api";
+"use client";
+
+import { useEffect, useState, use } from "react";
+import API from "@/lib/api";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { ExternalLink, User, Mail, Phone, MapPin, Building, ArrowRight } from "lucide-react";
+import { ExternalLink, User, Mail, Phone, MapPin, Building, ArrowRight, FileText } from "lucide-react";
+import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 
-export default async function ClientPortalDashboard({ params }) {
-  const { clientId } = await params;
+export default function ClientPortalDashboard({ params }) {
+  const { clientId } = use(params);
 
-  let profile = null;
-  let projects = [];
-  let invoices = [];
+  const [profile, setProfile] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  try {
-    const [profileRes, projectsRes, invoicesRes] = await Promise.all([
-      serverFetch(`/portal/client/${clientId}`),
-      serverFetch(`/portal/client/${clientId}/projects`),
-      serverFetch(`/portal/client/${clientId}/invoices`),
-    ]);
-    profile = profileRes.data;
-    projects = projectsRes.data;
-    invoices = invoicesRes.data;
-  } catch (error) {
+  useEffect(() => {
+    Promise.all([
+      API.get(`/portal/client/${clientId}`),
+      API.get(`/portal/client/${clientId}/projects`),
+      API.get(`/portal/client/${clientId}/invoices`),
+    ])
+      .then(([profileRes, projectsRes, invoicesRes]) => {
+        setProfile(profileRes.data.data);
+        setProjects(projectsRes.data.data);
+        setInvoices(invoicesRes.data.data);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setError(true);
+        setIsLoading(false);
+      });
+  }, [clientId]);
+
+  if (isLoading) {
+    return <div className="py-20 text-center text-slate-500">Loading portal...</div>;
+  }
+
+  if (error || !profile) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Portal Access Error</h2>
@@ -39,61 +58,91 @@ export default async function ClientPortalDashboard({ params }) {
   const otherProjects = projects.filter(p => p.status !== "Active" && p.status !== "Planning");
 
   return (
-    <div className="space-y-12 pb-12">
+    <div className="space-y-12 pb-12 relative z-10">
+      {/* Background Effect (similar to questionnaire) */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none -z-10" />
+
       {/* Header Section */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+      <div className="text-center flex flex-col items-center pt-8">
+        <div className="flex flex-col items-center gap-4 mb-6">
+          {profile.organization?.name && (
+            <DynamicAvatar type="organization" seed={profile.organization.name} size={64} className="shadow-lg border-2 border-background" />
+          )}
+          <p className="text-xs font-bold tracking-widest text-primary uppercase">
+            {profile.organization?.name}
+          </p>
+        </div>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-4">
           Welcome, {profile.name}
         </h1>
-        <p className="text-slate-500 text-lg">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Here is an overview of your projects and invoices with {profile.organization.name}.
         </p>
       </div>
 
       {/* Profile Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <User className="h-5 w-5 text-slate-400" />
-              Your Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 text-slate-700">
-              <Mail className="h-4 w-4 text-slate-400" />
-              <span>{profile.email}</span>
-            </div>
-            {profile.phone && (
-              <div className="flex items-center gap-3 text-slate-700">
-                <Phone className="h-4 w-4 text-slate-400" />
-                <span>{profile.phone}</span>
+      <div className="mt-8">
+        <Card className="border-border/40 shadow-xl shadow-black/5 rounded-3xl bg-card/60 backdrop-blur-md overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 pointer-events-none" />
+          <CardContent className="p-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/40">
+              {/* Client Info */}
+              <div className="p-8 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-primary/10 rounded-xl">
+                    <User className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Your Profile</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 text-muted-foreground group">
+                    <div className="p-2 bg-background rounded-lg border border-border/50 group-hover:border-primary/30 transition-colors">
+                      <Mail className="h-4 w-4" />
+                    </div>
+                    <span className="font-medium text-foreground/80">{profile.email}</span>
+                  </div>
+                  {profile.phone && (
+                    <div className="flex items-center gap-4 text-muted-foreground group">
+                      <div className="p-2 bg-background rounded-lg border border-border/50 group-hover:border-primary/30 transition-colors">
+                        <Phone className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium text-foreground/80">{profile.phone}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
 
-        <Card className="border-slate-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Building className="h-5 w-5 text-slate-400" />
-              Organization Contact
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="font-medium text-slate-900 mb-1">{profile.organization.name}</div>
-            {profile.organization.profile?.email && (
-              <div className="flex items-center gap-3 text-slate-700 text-sm">
-                <Mail className="h-4 w-4 text-slate-400" />
-                <span>{profile.organization.profile.email}</span>
+              {/* Org Info */}
+              <div className="p-8 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-primary/10 rounded-xl">
+                    <Building className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground">Organization Contact</h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 text-muted-foreground">
+                     <span className="font-semibold text-foreground tracking-tight">{profile.organization.name}</span>
+                  </div>
+                  {profile.organization.profile?.email && (
+                    <div className="flex items-center gap-4 text-muted-foreground group">
+                      <div className="p-2 bg-background rounded-lg border border-border/50 group-hover:border-primary/30 transition-colors">
+                        <Mail className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium text-foreground/80">{profile.organization.profile.email}</span>
+                    </div>
+                  )}
+                  {profile.organization.profile?.phone && (
+                    <div className="flex items-center gap-4 text-muted-foreground group">
+                      <div className="p-2 bg-background rounded-lg border border-border/50 group-hover:border-primary/30 transition-colors">
+                        <Phone className="h-4 w-4" />
+                      </div>
+                      <span className="font-medium text-foreground/80">{profile.organization.profile.phone}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-            {profile.organization.profile?.phone && (
-              <div className="flex items-center gap-3 text-slate-700 text-sm">
-                <Phone className="h-4 w-4 text-slate-400" />
-                <span>{profile.organization.profile.phone}</span>
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -124,10 +173,8 @@ export default async function ClientPortalDashboard({ params }) {
                   Started: {format(new Date(project.startDate), "MMM d, yyyy")}
                 </CardContent>
                 <CardFooter className="pt-0 border-t border-slate-100 p-4 mt-auto">
-                  <Button variant="ghost" size="sm" className="w-full justify-between" asChild>
-                    <Link href={`/c/${clientId}/p/${project.id}`}>
+                  <Button variant="ghost" size="sm" className="w-full justify-between" render={<Link href={`/c/${clientId}/p/${project.id}`} />}>
                       View Details <ArrowRight className="h-4 w-4 ml-2" />
-                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -177,10 +224,8 @@ export default async function ClientPortalDashboard({ params }) {
                         {invoice.currency} {invoice.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/c/${clientId}/i/${invoice.id}`}>
+                        <Button variant="ghost" size="sm" render={<Link href={`/c/${clientId}/i/${invoice.id}`} />}>
                             View <ExternalLink className="h-3 w-3 ml-1.5" />
-                          </Link>
                         </Button>
                       </td>
                     </tr>
@@ -210,10 +255,8 @@ export default async function ClientPortalDashboard({ params }) {
                   </div>
                 </CardHeader>
                 <CardFooter className="pt-2 p-4 mt-auto">
-                  <Button variant="link" size="sm" className="px-0 text-slate-500 hover:text-slate-900" asChild>
-                    <Link href={`/c/${clientId}/p/${project.id}`}>
+                  <Button variant="link" size="sm" className="px-0 text-slate-500 hover:text-slate-900" render={<Link href={`/c/${clientId}/p/${project.id}`} />}>
                       View Details
-                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
