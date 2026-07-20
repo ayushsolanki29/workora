@@ -72,6 +72,7 @@ class OrganizationService {
     if (bankName !== undefined) profileData.bankName = bankName || null;
     if (routingNumber !== undefined) profileData.routingNumber = routingNumber || null;
     if (branch !== undefined) profileData.branch = branch || null;
+    if (data.upiId !== undefined) profileData.upiId = data.upiId || null;
 
     if (masterCurrency !== undefined) {
       // Prevent changing currency if transactions exist

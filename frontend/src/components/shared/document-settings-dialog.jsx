@@ -43,6 +43,7 @@ export function DocumentSettingsDialog({
         bankName: profile.bankName || "",
         routingNumber: profile.routingNumber || "",
         branch: profile.branch || "",
+        upiId: profile.upiId || "",
         termsAndConditions: profile.termsAndConditions || "",
         invoiceFooterNote: profile.invoiceFooterNote || "",
         expenseFooterNote: profile.expenseFooterNote || "",
@@ -62,6 +63,7 @@ export function DocumentSettingsDialog({
                 bankName: organization.profile.bankName || "",
                 routingNumber: organization.profile.routingNumber || "",
                 branch: organization.profile.branch || "",
+                upiId: organization.profile.upiId || "",
                 termsAndConditions: organization.profile.termsAndConditions || "",
                 invoiceFooterNote: organization.profile.invoiceFooterNote || "",
                 expenseFooterNote: organization.profile.expenseFooterNote || "",
@@ -171,6 +173,12 @@ export function DocumentSettingsDialog({
                                     <Label>Branch</Label>
                                     <Input value={formData.branch} onChange={handleInputChange('branch')} />
                                 </div>
+                                {isIndia && (
+                                    <div className="space-y-2">
+                                        <Label>UPI ID</Label>
+                                        <Input value={formData.upiId} onChange={handleInputChange('upiId')} placeholder="e.g. business@upi" />
+                                    </div>
+                                )}
                             </TabsContent>
 
                             <TabsContent value="template" className="space-y-4">

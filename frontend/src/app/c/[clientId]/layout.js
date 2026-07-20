@@ -8,7 +8,6 @@ import API from "@/lib/api";
 import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { LogoIcon } from "@/components/logo";
 import { PublicFooter } from "@/components/shared/public-footer";
-import { ClientPortalActions } from "@/components/portal/client-portal-actions";
 import { useEffect, useState, use, createContext } from "react";
 
 export const ClientPortalContext = createContext({ 
@@ -70,10 +69,6 @@ export default function ClientPortalLayout({ children, params }) {
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline-block">Invoices</span>
             </Link>
-            
-            <div className="pl-4 border-l border-slate-200">
-              <ClientPortalActions profile={profile} />
-            </div>
           </nav>
         </div>
       </header>

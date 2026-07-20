@@ -36,6 +36,7 @@ exports.getClientProfile = async (clientId) => {
               accountNumber: true,
               routingNumber: true,
               branch: true,
+              upiId: true,
             }
           }
         }

@@ -408,6 +408,7 @@ model OrganizationProfile {
   bankName      String?
   routingNumber String? // Generic (e.g. IFSC, Sort Code, Routing Number)
   branch        String?
+  upiId         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
