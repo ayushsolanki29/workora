@@ -208,7 +208,7 @@ export default function LoginPage() {
                     onChange={(e) => setTermsAccepted(e.target.checked)}
                   />
                   <label htmlFor="terms" className="text-[13px] text-muted-foreground leading-snug cursor-pointer">
-                    By signing in, you agree to our <Link href="#" className="text-foreground hover:underline">Terms</Link> and <Link href="#" className="text-foreground hover:underline">Privacy Policy</Link>.
+                    By signing in, you agree to our <Link href="/terms" className="text-foreground hover:underline">Terms</Link> and <Link href="/privacy-policy" className="text-foreground hover:underline">Privacy Policy</Link>.
                   </label>
                 </div>
               </>

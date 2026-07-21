@@ -3,6 +3,7 @@ import { GithubIcon } from "@/components/github-icon";
 import { InstagramIcon } from "@/components/instagram-icon";
 import { XIcon } from "@/components/x-icon";
 import { Logo } from "@/components/logo";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FullWidthDivider } from "@/components/full-width-divider";
 
@@ -16,9 +17,9 @@ export function Footer() {
             <FullWidthDivider position="top" />
             <div className="grid max-w-5xl grid-cols-6 gap-6 p-4">
 				<div className="col-span-6 flex flex-col gap-4 pt-5 md:col-span-4">
-					<a className="w-max" href="#">
+					<Link className="w-max" href="/">
 						<Logo className="h-5" />
-					</a>
+					</Link>
 					<p className="max-w-sm text-balance text-muted-foreground text-sm">
 						An open-source business operating platform for freelancers, consultants, and small agencies.
 					</p>

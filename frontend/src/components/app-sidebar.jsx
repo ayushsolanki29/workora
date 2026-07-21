@@ -144,9 +144,7 @@ export function AppSidebar() {
 						</SidebarMenuItem>
 					))}
 				</SidebarMenu>
-				<div className="mt-4 text-[10px] text-muted-foreground p-2 text-center group-data-[collapsible=icon]:hidden">
-					© 2026 Soseki. All rights reserved.
-				</div>
+				{/* Removed copyright from sidebar as requested */}
 			</SidebarFooter>
             <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
         </Sidebar>

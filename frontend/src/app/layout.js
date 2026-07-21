@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { BackgroundTracker } from "@/components/background-tracker";
 import { CookieConsent } from "@/components/cookie-consent";
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
+import Script from 'next/script';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -75,7 +76,9 @@ export default function RootLayout({ children }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <script
+        <Script
+          id="google-consent-mode"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
