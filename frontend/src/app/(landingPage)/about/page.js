@@ -26,8 +26,13 @@ import {
   LineChart,
   CircleDollarSign,
   Bot,
+  Linkedin,
+
 } from "lucide-react";
 import { motion } from "motion/react";
+import { GithubIcon } from "@/components/github-icon";
+import { XIcon } from "@/components/x-icon";
+import { LinkedinIcon } from "@/components/linkedin-icon";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -222,97 +227,86 @@ export default function AboutPage() {
     <main className="min-h-screen bg-[#f3f8ff] text-[#09090b] font-sans selection:bg-blue-200 overflow-x-clip">
       <Header />
 
-      <section className="relative min-h-screen border-b border-slate-100 px-6">
+      <section className="relative pt-32 pb-24 border-b border-slate-100 px-6 overflow-hidden">
+        {/* Background decorations */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-50/70 via-white to-white pointer-events-none" />
-        <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr]">
-          <Reveal className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[13px] font-medium text-blue-600 shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" />
-              About Soseki
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[800px] h-[600px] bg-gradient-to-br from-blue-100/40 to-indigo-50/40 rounded-full blur-3xl opacity-50 pointer-events-none" />
+        <div className="absolute top-32 left-0 -translate-x-1/3 w-[600px] h-[500px] bg-gradient-to-tr from-emerald-50/40 to-cyan-50/40 rounded-full blur-3xl opacity-50 pointer-events-none" />
+
+        <div className="mx-auto max-w-4xl text-center relative z-10 pt-12 md:pt-20">
+          <Reveal>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[12px] font-bold tracking-wider text-slate-600 uppercase mb-8">
+              <BookOpen className="w-3.5 h-3.5" />
+              Our Story
             </div>
-            <h1 className="mt-6 max-w-3xl text-5xl font-bold tracking-tight text-slate-900 sm:text-[4.5rem] leading-[1.03]">
-              Building a better business workspace
+
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 mb-8 leading-[1.05]">
+              Zero bloat. Zero friction. <br className="hidden md:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                Absolute clarity.
+              </span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-[21px]">
-              Soseki is an open-source business operating system built for freelancers,
-              consultants, agencies, and service businesses. Instead of juggling
-              spreadsheets, disconnected tools, and expensive subscriptions, Soseki brings
-              everything together into one modern workspace.
+
+            <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-3xl mx-auto">
+              Say goodbye to the chaos of scattered spreadsheets and bloated SaaS subscriptions.
+              <strong> Soseki</strong> is the modern, open-source operating system for freelancers, agencies, and small teams.
             </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "bg-[#2563eb] text-white hover:bg-[#1d4ed8] px-6")}>
-                Get Started
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/request-access" className={cn(buttonVariants({ size: "lg" }), "bg-[#2563eb] text-white hover:bg-[#1d4ed8] px-8 rounded-xl shadow-lg shadow-blue-500/20 text-[15px] font-bold")}>
+                Request Early Access
               </Link>
-              <Link href="/features" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-slate-200 bg-white px-6 text-slate-700 hover:bg-slate-50")}>
-                View Documentation
+              <Link href="https://github.com/ayushsolanki29/soseki-app" target="_blank" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-slate-200 bg-white px-8 text-slate-700 hover:bg-slate-50 rounded-xl text-[15px] font-bold flex items-center gap-2")}>
+                <GithubIcon className="w-4 h-4" fill="currentColor" /> View on GitHub
               </Link>
-            </div>
-            <div className="mt-10 flex flex-wrap gap-3 text-[13px] text-slate-500">
-              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">Open source</span>
-              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">Self hosted</span>
-              <span className="rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">Premium UX</span>
-            </div>
-            <div className="mt-12 grid max-w-2xl gap-3 sm:grid-cols-3">
-              {[
-                { label: "Unified workspace", value: "One system" },
-                { label: "Setup time", value: "Minutes" },
-                { label: "Ownership", value: "Yours" },
-              ].map((item) => (
-                <div key={item.label} className="rounded-[18px] border border-slate-100 bg-white/90 px-4 py-3 shadow-[0_8px_30px_rgba(15,23,42,0.04)] backdrop-blur">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">{item.label}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">{item.value}</p>
-                </div>
-              ))}
             </div>
           </Reveal>
+        </div>
 
-          <Reveal delay={0.1} className="relative z-10">
-            <div className="relative mx-auto w-full max-w-[640px]">
-              <div className="absolute -inset-8 rounded-[36px] bg-blue-100/25 blur-3xl" />
-              <div className="relative grid gap-4">
-                <div className="overflow-hidden rounded-[28px] border border-slate-100 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.12)]">
-                  <Image
-                    src="/dashboard.png"
-                    alt="Soseki dashboard preview"
-                    width={1200}
-                    height={760}
-                    priority
-                    className="h-auto w-full object-cover"
-                  />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
-                    <Image
-                      src="/login-banner.jpeg"
-                      alt="Soseki login banner preview"
-                      width={900}
-                      height={560}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.08)]">
-                    <Image
-                      src="/banner.jpeg"
-                      alt="Soseki brand banner preview"
-                      width={900}
-                      height={560}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </div>
-                <div className="absolute left-4 top-4 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-lg backdrop-blur-md">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Built for clarity</p>
-                  <p className="mt-1 text-sm font-medium text-slate-900">A workspace that feels calm from the first click.</p>
-                </div>
-                <div className="absolute bottom-4 right-4 w-[220px] rounded-2xl border border-white/70 bg-white/85 px-4 py-3 shadow-lg backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <Image src="/logo.png" alt="Soseki logo" width={40} height={40} className="h-10 w-10 rounded-xl border border-slate-200 object-cover" />
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-600">Premium by design</p>
-                      <p className="mt-1 text-sm font-medium text-slate-900">Refined surfaces, no noise.</p>
-                    </div>
-                  </div>
-                </div>
+        {/* Hero Image Placeholder */}
+        <Reveal delay={0.2} className="relative z-20 mt-20 mx-auto max-w-6xl">
+          <div className="aspect-[16/9] w-full rounded-[2rem] bg-slate-100 border border-slate-200/60 shadow-2xl shadow-blue-900/5 flex flex-col items-center justify-center text-slate-400 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white to-transparent opacity-50" />
+            <LayoutGrid className="w-16 h-16 mb-4 text-slate-300 relative z-10" />
+            <p className="font-semibold text-lg relative z-10 text-slate-500">Team Collaboration Image Placeholder</p>
+            <p className="text-sm font-medium mt-2 relative z-10">We will replace this with a generated image</p>
+          </div>
+        </Reveal>
+      </section>
+
+      {/* Founder Quote Section */}
+      <section className="border-b border-slate-100 bg-slate-50/50 px-6 py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <Reveal>
+            <div className="relative">
+              <span className="absolute -top-10 -left-6 text-8xl text-blue-200/50 font-serif leading-none select-none">"</span>
+              <p className="text-2xl md:text-3xl font-medium text-slate-800 leading-relaxed relative z-10">
+                I built Soseki because I was tired of duct-taping five different SaaS subscriptions together just to get paid. The goal was simple: create one beautiful, open-source platform that actually respects the freelancer's workflow and data ownership.
+              </p>
+              <span className="absolute -bottom-16 -right-6 text-8xl text-blue-200/50 font-serif leading-none select-none">"</span>
+            </div>
+
+            <div className="mt-12 flex flex-col items-center justify-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-slate-200 border-2 border-white shadow-md overflow-hidden relative">
+                <Image src="/ayush-solanki.webp" alt="Ayush Solanki" fill className="object-cover" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg">Ayush Solanki</h3>
+                <p className="text-slate-500 text-sm font-medium">Founder & Creator of Soseki</p>
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <Link href="https://www.ayushsolanki.site/" target="_blank" className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-sm" aria-label="Website">
+                  <Globe className="w-4 h-4" />
+                </Link>
+                <Link href="https://x.com/ayushsolanki29" target="_blank" className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-sm" aria-label="X (Twitter)">
+                  <XIcon className="w-4 h-4" />
+                </Link>
+                <Link href="https://github.com/ayushsolanki29" target="_blank" className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-sm" aria-label="GitHub">
+                  <GithubIcon className="w-4 h-4" fill="currentColor" />
+                </Link>
+                <Link href="https://www.linkedin.com/in/ayush-solanki-a3909625a/" target="_blank" className="p-2 rounded-full bg-white border border-slate-200 text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-colors shadow-sm" aria-label="LinkedIn">
+                  <LinkedinIcon className="w-4 h-4" />
+                </Link>
               </div>
             </div>
           </Reveal>

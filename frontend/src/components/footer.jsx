@@ -97,7 +97,7 @@ const resources = [
 const socialLinks = [
 	{
 		icon: <GithubIcon />,
-		link: "https://github.com/ayushsolanki29/soseki",
+		link: "https://github.com/ayushsolanki29/soseki-app",
 	},
 	{
 		icon: <InstagramIcon />,

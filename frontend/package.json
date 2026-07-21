@@ -3,13 +3,13 @@
   "version": "1.0.0-beta-release",
   "description": "All-in-one business operating platform for freelancers, consultants, and small agencies.",
   "author": "Ayush Solanki",
-  "homepage": "https://github.com/ayushsolanki29/soseki",
+  "homepage": "https://github.com/ayushsolanki29/soseki-app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ayushsolanki29/soseki"
+    "url": "https://github.com/ayushsolanki29/soseki-app"
   },
   "bugs": {
-    "url": "https://github.com/ayushsolanki29/soseki/issues"
+    "url": "https://github.com/ayushsolanki29/soseki-app/issues"
   },
   "license": "MIT",
   "private": true,

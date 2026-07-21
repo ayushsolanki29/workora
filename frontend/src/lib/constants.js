@@ -4,7 +4,7 @@ export const APP_NAME = "Soseki";
 export const APP_VERSION = `v${packageJson.version}`;
 export const APP_AUTHOR = packageJson.author || "Ayush Solanki";
 export const APP_AUTHOR_URL = "https://ayushsolanki.site";
-export const APP_GITHUB_URL = packageJson.repository?.url || "https://github.com/ayushsolanki29/soseki";
+export const APP_GITHUB_URL = packageJson.repository?.url || "https://github.com/ayushsolanki29/soseki-app";
 export const APP_TWITTER_URL = "https://x.com/ayushsolanki29";
 
 export const APP_SOCIALS = [
