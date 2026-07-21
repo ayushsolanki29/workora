@@ -13,6 +13,9 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata = {
   title: "Soseki",
   description: "All-in-one business operating platform for freelancers, consultants, and small agencies.",
+  verification: {
+    google: "g2zd7qYHgqu2qzAwP8FGpj_t3XsNuHH-VcKgmBfK9aU",
+  },
 };
 
 export default function RootLayout({ children }) {
