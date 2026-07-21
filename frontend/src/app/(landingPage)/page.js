@@ -22,12 +22,12 @@ export default function LandingPage() {
         <HeroSection />
 
         {/* Trusted By Section */}
-        <section className="bg-white py-20 border-t border-slate-100 flex flex-col items-center border-b overflow-hidden">
+        {/* <section className="bg-white py-20 border-t border-slate-100 flex flex-col items-center border-b overflow-hidden">
           <p className="text-[13px] font-medium text-slate-500 mb-8">Trusted by fast-growing startups and agencies</p>
           <div className="w-full max-w-6xl mx-auto px-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
             <LogoCloud />
           </div>
-        </section>
+        </section> */}
 
 
 
@@ -37,9 +37,9 @@ export default function LandingPage() {
         {/* <ZeroLockinSection /> */}
 
         {/* Testimonials Section */}
-        <section className="bg-[#fcfdfd] py-12 border-b border-slate-100">
+        {/* <section className="bg-[#fcfdfd] py-12 border-b border-slate-100">
           <TestimonialsSection />
-        </section>
+        </section> */}
         {/* Overview Features Grid */}
         <section className="bg-slate-50 py-24 border-b border-slate-100 px-6">
           <div className="max-w-5xl mx-auto text-center mb-16">
@@ -51,9 +51,9 @@ export default function LandingPage() {
           <FeatureSection />
         </section>
         {/* Integrations Section */}
-        <section className="bg-white">
+        {/* <section className="bg-white">
           <Integrations />
-        </section>
+        </section> */}
 
         {/* Pricing Section */}
         <section className="bg-white">
