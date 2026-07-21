@@ -86,10 +86,7 @@ const company = [
 ];
 
 const resources = [
-	{
-		title: "Blog",
-		href: "/blog",
-	},
+
 	{
 		title: "Help Center",
 		href: "/contact",

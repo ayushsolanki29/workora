@@ -28,7 +28,7 @@ const SearchWidget = dynamic(() => import("@/components/landing/insight-widgets"
 
 export default function FeaturesPage() {
   return (
-    <main className="min-h-screen bg-[#fcfdfd] text-[#09090b] font-sans selection:bg-blue-200 flex flex-col">
+    <main className="min-h-screen bg-[#fcfdfd] text-[#09090b] font-sans selection:bg-blue-200 flex flex-col overflow-x-clip">
       <Header />
 
       {/* Hero Section */}
@@ -252,7 +252,10 @@ export default function FeaturesPage() {
         <CallToAction />
       </section>
 
-      <Footer />
+      {/* Footer */}
+      <section className="bg-white">
+        <Footer />
+      </section>
     </main>
   );
 }

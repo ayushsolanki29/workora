@@ -10,7 +10,7 @@ export function HeroSection() {
   return (
     <main className="mx-auto max-w-5xl px-6 pt-24 pb-32 text-center flex flex-col items-center overflow-hidden">
       <div className="flex flex-col items-center w-full">
-        <Link href="/docs" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-[13px] font-medium text-slate-600 hover:bg-slate-200 transition-colors mb-8">
+        <Link href="/features" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 text-[13px] font-medium text-slate-600 hover:bg-slate-200 transition-colors mb-8">
           The open-source platform for freelancers and agencies <ArrowRight className="w-3.5 h-3.5" />
         </Link>
 

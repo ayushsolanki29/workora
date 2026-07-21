@@ -1,42 +1,19 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FullWidthDivider } from "@/components/full-width-divider";
 import { CheckIcon } from "lucide-react";
-
-const pricingPlans = [
-	{
-		name: "OPEN SOURCE",
-		price: "Free",
-		description: "For independent freelancers & individuals",
-		featuresTitle: "FREE, FOREVER:",
-		features: [
-			"Unlimited clients & projects",
-			"Unlimited invoices & expenses",
-			"Multi-Currency Invoicing",
-			"Smart Questionnaires",
-			"AI-Assisted Migration",
-			"100% Self-Hostable",
-		],
-		href: "#",
-	},
-	{
-		name: "COMMERCIAL",
-		isPopular: true,
-		href: "#",
-		price: "$29",
-		period: "month",
-		description: "For boutique agencies & growing teams",
-		featuresTitle: "EVERYTHING IN OPEN SOURCE And",
-		features: [
-			"Managed Cloud Hosting",
-			"Dedicated Priority Support",
-			"Custom Domain & Branding",
-			"Automated Cloud Backups",
-			"Advanced Analytics & Exports",
-		],
-	},
-];
+import { PRICING_DATA } from "@/config/pricing-data";
+import { cn } from "@/lib/utils";
 
 export function PricingSection() {
+    const [currency, setCurrency] = useState("usd");
+    const paidData = PRICING_DATA.paid[currency];
+
+    // For the homepage simplified view, we will just show the 15-credit package price.
+    const startingPackage = paidData.packages[0];
+
 	return (
         <section
             className="mx-auto max-w-5xl place-content-center border-x py-24">
@@ -46,61 +23,111 @@ export function PricingSection() {
 
 				<div
                     className="grid grid-cols-1 gap-px bg-border md:grid-cols-2 lg:grid-cols-4">
-					<div className="flex flex-col bg-background p-8 md:col-span-2">
-						<p className="mb-6 text-muted-foreground text-sm uppercase tracking-wider">
-							PRICING
-						</p>
-						<h1 className="font-bold text-3xl leading-tight md:text-5xl">
-							Pricing that doesn't suck
-						</h1>
+					<div className="flex flex-col justify-between bg-background p-8 md:col-span-2">
+                        <div>
+    						<p className="mb-6 text-muted-foreground text-sm uppercase tracking-wider">
+    							PRICING
+    						</p>
+    						<h1 className="font-bold text-3xl leading-tight md:text-5xl mb-4">
+    							Pay for what you use. Nothing more.
+    						</h1>
+                            <p className="text-muted-foreground text-balance">
+                                We ditched the rigid subscription model. Buy credits only when you need them.
+                            </p>
+                        </div>
+
+                        {/* Currency Toggle */}
+                        <div className="mt-8 bg-slate-100 p-1 rounded-lg inline-flex items-center shadow-inner self-start">
+                            <button 
+                                onClick={() => setCurrency("usd")}
+                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all", currency === "usd" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                            >
+                                USD ($)
+                            </button>
+                            <button 
+                                onClick={() => setCurrency("inr")}
+                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all", currency === "inr" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                            >
+                                INR (₹)
+                            </button>
+                        </div>
 					</div>
 
-					{pricingPlans.map((plan) => (
-						<PricingCard key={plan.name} plan={plan} />
-					))}
+                    {/* Free Plan */}
+					<div className="flex flex-col bg-background *:px-4 *:py-6">
+                        <div className="border-b">
+            				<p className="mb-6 text-muted-foreground text-sm uppercase tracking-wider">
+            					COMMUNITY FREE
+            				</p>
+            				<div className="mb-2 flex items-baseline gap-2">
+            					<h2 className="font-bold text-4xl">25</h2>
+            					<span className="text-muted-foreground text-xs">
+            						Credits / month
+            					</span>
+            				</div>
+            				<p className="mb-8 text-muted-foreground text-sm">
+            					Refreshed automatically. Forever free.
+            				</p>
+            
+            				<Button
+                                className="w-full"
+                                variant="outline"
+                                asChild
+                            >
+                                <a href="/login">Start for Free</a>
+                            </Button>
+            			</div>
+                        <div className="space-y-3 text-muted-foreground text-sm">
+            				<p className="mb-6 text-xs uppercase">FREE, FOREVER:</p>
+            				{PRICING_DATA.free.features.slice(0, 5).map((feature) => (
+            					<p className="flex items-start gap-2 text-foreground/80" key={feature}>
+            						<CheckIcon className="size-4 shrink-0 mt-0.5" />
+            						{feature}
+            					</p>
+            				))}
+            			</div>
+                    </div>
+
+                    {/* Paid Plan */}
+                    <div className="flex flex-col bg-background *:px-4 *:py-6 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold uppercase py-0.5 px-3 rounded-bl-lg tracking-wider">
+                            Pay-As-You-Go
+                        </div>
+                        <div className="border-b">
+            				<p className="mb-6 text-muted-foreground text-sm uppercase tracking-wider text-blue-600 font-bold">
+            					PRO TIER
+            				</p>
+            				<div className="mb-2 flex items-baseline gap-2">
+            					<h2 className="font-bold text-4xl">{paidData.currencySymbol}{startingPackage.price.toFixed(2)}</h2>
+            					<span className="text-muted-foreground text-xs font-medium">
+            						/ {startingPackage.credits} Credits
+            					</span>
+            				</div>
+            				<p className="mb-8 text-muted-foreground text-sm">
+            					Purchase credits in batches. They never expire.
+            				</p>
+            
+            				<Button
+                                className="w-full"
+                                variant="default"
+                                asChild
+                            >
+                                <a href="/checkout">Purchase Credits</a>
+                            </Button>
+            			</div>
+                        <div className="space-y-3 text-muted-foreground text-sm">
+            				<p className="mb-6 text-xs uppercase">EVERYTHING IN FREE, AND:</p>
+            				{PRICING_DATA.paid.features.slice(2, 7).map((feature) => (
+            					<p className="flex items-start gap-2 text-foreground/80" key={feature}>
+            						<CheckIcon className="size-4 shrink-0 mt-0.5 text-blue-500" />
+            						{feature}
+            					</p>
+            				))}
+            			</div>
+                    </div>
+
 				</div>
 			</div>
         </section>
-    );
-}
-
-function PricingCard({
-    plan
-}) {
-	return (
-        <div className="flex flex-col bg-background *:px-4 *:py-6">
-            <div className="border-b">
-				<p className="mb-6 text-muted-foreground text-sm uppercase tracking-wider">
-					{plan.name}
-				</p>
-				<div className="mb-2 flex items-baseline gap-2">
-					<h2 className="font-bold text-4xl">{plan.price}</h2>
-					{plan.period && (
-						<span className="text-muted-foreground text-xs">
-							/ {plan.period}
-						</span>
-					)}
-				</div>
-				<p className="mb-8 text-muted-foreground">
-					{plan.description}
-				</p>
-
-				<Button
-                    className="w-full"
-                    variant={plan.isPopular ? "default" : "outline"}
-                    render={<a href={plan.href} />}
-                    nativeButton={false}>Get started</Button>
-			</div>
-            <div className="space-y-3 text-muted-foreground text-sm">
-				<p className="mb-6 text-xs uppercase">{plan.featuresTitle}</p>
-
-				{plan.features.map((feature) => (
-					<p className="flex items-center gap-2 text-foreground/80" key={feature}>
-						<CheckIcon className="size-4" />
-						{feature}
-					</p>
-				))}
-			</div>
-        </div>
     );
 }
