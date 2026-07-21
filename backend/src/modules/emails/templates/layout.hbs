@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
   <head>
@@ -5,52 +6,65 @@
     <meta name="x-apple-disable-message-reformatting" />
     <title>{{subject}}</title>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
       
-      * {
-        font-family: 'Inter', Arial, sans-serif;
+      body, table, td, p, a, h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #111827;
       }
-      body { background-color: rgb(243,244,246); margin: 0; padding: 0; }
+      body { background-color: #F3F4F6; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
       
-      .container { max-width: 640px; margin: 2rem auto; width: 100%; background-color: rgb(255,255,255); padding: 1.5rem; border-radius: 10px; }
+      .wrapper { width: 100%; background-color: #F3F4F6; padding: 40px 0; }
+      .container { max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid #E5E7EB; }
       
-      .header { padding-bottom: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+      .header { padding: 32px 40px; border-bottom: 1px solid #F3F4F6; background-color: #FFFFFF; }
       
-      .content { background-color: rgb(243,244,246); padding: 2rem 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; color: rgb(67,69,75); }
+      .content { padding: 40px; background-color: #FFFFFF; color: #374151; font-size: 16px; line-height: 1.625; }
       
-      .footer { text-align: center; color: rgb(123,125,129); font-size: 12px; margin-top: 2rem; padding-bottom: 2rem; }
+      .footer { text-align: center; padding: 32px 40px; background-color: #F9FAFB; border-top: 1px solid #F3F4F6; color: #6B7280; font-size: 13px; line-height: 1.5; }
+      .footer a { color: #4F46E5; text-decoration: none; font-weight: 500; }
+      .footer a:hover { text-decoration: underline; }
       
-      .btn { line-height: 1.5rem; text-decoration: none; display: inline-block; background-color: rgb(20,23,30); padding: 16px 28px; border-radius: 0.5rem; font-size: 16px; font-weight: 420; color: rgb(255,255,255); text-align: center; margin-top: 1.5rem; }
+      .btn { display: inline-block; background-color: #111827; color: #FFFFFF; padding: 14px 28px; border-radius: 8px; font-size: 15px; font-weight: 500; text-decoration: none; text-align: center; margin-top: 24px; margin-bottom: 8px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: background-color 0.2s; }
+      .btn:hover { background-color: #374151; color: #FFFFFF; }
       
-      @media (max-width:600px) {
-        .container { margin-top: 0; padding: 0.5rem; border-radius: 0; }
+      @media (max-width:640px) {
+        .wrapper { padding: 20px 10px; }
+        .container { border-radius: 8px; }
+        .header, .content, .footer { padding: 24px 20px; }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="header">
-        <table width="100%">
-          <tr>
-            <td style="width: 50%; text-align: left; vertical-align: middle;">
-              <strong>Soseki App</strong>
-            </td>
-            <td style="width: 50%; text-align: right; vertical-align: middle;">
-              <span style="color:rgb(123,125,129); font-size: 13px;">Notification</span>
-            </td>
-          </tr>
-        </table>
-      </div>
+    <div class="wrapper">
+      <div class="container">
+        <div class="header">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="width: 50%; text-align: left; vertical-align: middle;">
+                {{#if logoUrl}}
+                  <img src="{{logoUrl}}" alt="Soseki App" style="height: 36px; width: auto; display: block;" />
+                {{else}}
+                  <strong style="font-size: 20px; letter-spacing: -0.02em;">Soseki App</strong>
+                {{/if}}
+              </td>
+              <td style="width: 50%; text-align: right; vertical-align: middle;">
+                <span style="color: #9CA3AF; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">Notification</span>
+              </td>
+            </tr>
+          </table>
+        </div>
 
-      <div class="content">
-        {{{body}}}
-      </div>
+        <div class="content">
+          {{{body}}}
+        </div>
 
-      <div class="footer">
-        <p>&copy; 2026 Soseki App. All rights reserved.</p>
-        {{#if showUnsubscribe}}
-        <p>To manage your email preferences, <a href="{{unsubscribeUrl}}" style="color: #4F46E5;">click here</a>.</p>
-        {{/if}}
+        <div class="footer">
+          <p style="margin: 0 0 12px 0;">&copy; 2026 Soseki App. All rights reserved.</p>
+          {{#if showUnsubscribe}}
+          <p style="margin: 0;">To manage your email preferences, <a href="{{unsubscribeUrl}}">click here</a>.</p>
+          {{/if}}
+        </div>
       </div>
     </div>
   </body>

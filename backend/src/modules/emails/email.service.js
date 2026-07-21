@@ -48,6 +48,8 @@ const queueEmail = async ({ to, subject, template = "default", context = {}, cat
   // Render HTML body
   // Add common variables
   context.subject = subject;
+  context.logoUrl = `${serverConfig.clientUrl}/logo.png`;
+  
   if (!context.unsubscribeUrl && userId) {
     // Generate an unsubscribe link if needed (mocked for now, can be updated later)
     context.unsubscribeUrl = `${serverConfig.clientUrl}/dashboard/profile?tab=preferences`;
