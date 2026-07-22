@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
 
 export function RecordPaymentDialog({ open, onOpenChange, invoice, onSuccess }) {
-  const remainingBalance = invoice ? invoice.totalAmount - invoice.paidAmount : 0;
+  const rawRemainingBalance = invoice ? invoice.totalAmount - invoice.paidAmount : 0;
+  const remainingBalance = Number(Math.max(0, rawRemainingBalance).toFixed(2));
   
   const [formData, setFormData] = useState({
     amount: remainingBalance > 0 ? remainingBalance : 0,
@@ -60,7 +62,7 @@ export function RecordPaymentDialog({ open, onOpenChange, invoice, onSuccess }) 
           <DialogTitle>Record Payment</DialogTitle>
           <DialogDescription>
             Record a new payment for {invoice?.invoiceNumber}. 
-            Remaining balance: <strong>${remainingBalance.toLocaleString()}</strong>
+            Remaining balance: <strong>{formatCurrency(remainingBalance, invoice?.currency || "USD")}</strong>
           </DialogDescription>
         </DialogHeader>
 

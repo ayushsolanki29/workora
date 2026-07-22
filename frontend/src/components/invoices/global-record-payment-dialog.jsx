@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import API from "@/lib/api";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
 
 export function GlobalRecordPaymentDialog({ open, onOpenChange, onSuccess }) {
   const [invoices, setInvoices] = useState([]);
@@ -52,7 +53,8 @@ export function GlobalRecordPaymentDialog({ open, onOpenChange, onSuccess }) {
   };
 
   const selectedInvoice = invoices.find(inv => inv.id === selectedInvoiceId);
-  const remainingBalance = selectedInvoice ? selectedInvoice.totalAmount - selectedInvoice.paidAmount : 0;
+  const rawRemainingBalance = selectedInvoice ? selectedInvoice.totalAmount - selectedInvoice.paidAmount : 0;
+  const remainingBalance = Number(Math.max(0, rawRemainingBalance).toFixed(2));
 
   useEffect(() => {
     if (selectedInvoice) {
@@ -105,7 +107,7 @@ export function GlobalRecordPaymentDialog({ open, onOpenChange, onSuccess }) {
                     ) : (
                         invoices.map(inv => (
                             <SelectItem key={inv.id} value={inv.id}>
-                                {inv.invoiceNumber} - {inv.client?.name} (${(inv.totalAmount - inv.paidAmount).toLocaleString()} due)
+                                {inv.invoiceNumber} - {inv.client?.name} ({formatCurrency(inv.totalAmount - inv.paidAmount, inv.currency || "USD")} due)
                             </SelectItem>
                         ))
                     )}
@@ -125,7 +127,7 @@ export function GlobalRecordPaymentDialog({ open, onOpenChange, onSuccess }) {
                       onChange={e => setFormData({...formData, amount: parseFloat(e.target.value) || 0})}
                       required
                   />
-                  <span className="text-xs text-muted-foreground">Remaining balance: ${remainingBalance.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground">Remaining balance: {formatCurrency(remainingBalance, selectedInvoice.currency || "USD")}</span>
                 </div>
 
                 <div className="flex flex-col gap-3">
