@@ -5,11 +5,20 @@ class ExpensesController {
     try {
       const { page, limit } = req.query;
       const result = await expensesService.getExpenses(req.user.organizationId, page, limit);
-      return res.status(200).json({ success: true, expenses: result.expenses, pagination: result.pagination });
+      return res.status(200).json({ success: true, expenses: result.expenses, summary: result.summary, pagination: result.pagination });
     } catch (error) {
       if (error.status === 401) {
         return res.status(error.status).json({ success: false, message: error.message });
       }
+      next(error);
+    }
+  }
+
+  async getCategories(req, res, next) {
+    try {
+      const categories = await expensesService.getUniqueCategories(req.user.organizationId);
+      return res.status(200).json({ success: true, categories });
+    } catch (error) {
       next(error);
     }
   }

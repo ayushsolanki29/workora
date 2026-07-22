@@ -47,8 +47,46 @@ class ExpensesService {
       orderBy: { createdAt: "desc" },
     });
 
+    const allExpenses = await prisma.expense.findMany({
+      where,
+      select: { amount: true, exchangeRate: true, category: true, date: true }
+    });
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const summary = {
+      totalExpenses: 0,
+      thisMonthExpenses: 0,
+      topCategory: "-"
+    };
+
+    const categoryTotals = {};
+
+    allExpenses.forEach(exp => {
+      const convertedAmount = Number(exp.amount || 0) * Number(exp.exchangeRate || 1.0);
+      summary.totalExpenses += convertedAmount;
+
+      if (exp.date) {
+        const expDate = new Date(exp.date);
+        if (expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear) {
+          summary.thisMonthExpenses += convertedAmount;
+        }
+      }
+
+      if (exp.category) {
+        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + convertedAmount;
+      }
+    });
+
+    if (Object.keys(categoryTotals).length > 0) {
+      summary.topCategory = Object.keys(categoryTotals).reduce((a, b) => categoryTotals[a] > categoryTotals[b] ? a : b);
+    }
+
     return {
       expenses,
+      summary,
       pagination: {
         total: totalCount,
         page: pageNum,
@@ -56,6 +94,19 @@ class ExpensesService {
         totalPages: Math.ceil(totalCount / limitNum)
       }
     };
+  }
+
+  async getUniqueCategories(organizationId) {
+    if (!organizationId) {
+      return [];
+    }
+    const categories = await prisma.expense.findMany({
+      where: { organizationId },
+      select: { category: true },
+      distinct: ['category'],
+      orderBy: { category: 'asc' }
+    });
+    return categories.map(c => c.category).filter(Boolean);
   }
 
   async getExpenseById(organizationId, id) {

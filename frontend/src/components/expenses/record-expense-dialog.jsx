@@ -5,6 +5,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import API from "@/lib/api";
 import { toast } from "sonner";
 import { fetchExchangeRate } from "@/lib/exchange";
@@ -16,7 +20,7 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
     description: "",
     amount: 0,
     date: new Date().toISOString().split('T')[0],
-    category: "Software",
+    category: "",
     status: "Paid",
     clientId: "none",
     projectId: "none",
@@ -26,28 +30,26 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [invoices, setInvoices] = useState([]);
+  const [dbCategories, setDbCategories] = useState([]);
   const { organization } = useOrganization();
   const masterCurrency = organization?.masterCurrency || "USD";
   const [exchangeRate, setExchangeRate] = useState(1.0);
   const [isFetchingRate, setIsFetchingRate] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
 
   useEffect(() => {
     if (open) {
       if (expenseToEdit) {
-        const predefinedCategories = ["Software", "Contractor", "Hardware", "Travel", "Other"];
-        const cat = expenseToEdit.category || "Software";
-        const isCustomCat = !predefinedCategories.includes(cat);
+        const cat = expenseToEdit.category || "";
 
         setFormData({
           description: expenseToEdit.description,
           amount: expenseToEdit.amount,
           date: expenseToEdit.date ? new Date(expenseToEdit.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          category: isCustomCat ? "Other" : cat,
+          category: cat,
           status: expenseToEdit.status || "Paid",
-          customCategory: isCustomCat ? cat : "",
           clientId: expenseToEdit.clientId || "none",
           projectId: expenseToEdit.projectId || "none",
           invoiceId: expenseToEdit.invoiceId || defaultInvoiceId || "none",
@@ -59,7 +61,7 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
           description: "",
           amount: 0,
           date: new Date().toISOString().split('T')[0],
-          category: "Software",
+          category: "",
           status: "Paid",
           clientId: "none",
           projectId: "none",
@@ -74,14 +76,12 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
 
   const fetchMetadata = async () => {
     try {
-      const [cRes, pRes, iRes] = await Promise.all([
-        API.get("/clients"),
+      const [pRes, catRes] = await Promise.all([
         API.get("/projects"),
-        API.get("/invoices")
+        API.get("/expenses/categories")
       ]);
-      setClients(cRes.data.clients || []);
       setProjects(pRes.data.projects || []);
-      setInvoices(iRes.data.invoices || []);
+      setDbCategories(catRes.data.categories || []);
       
       if (organization?.masterCurrency && !expenseToEdit && formData.currency !== organization.masterCurrency) {
           setFormData(prev => ({ ...prev, currency: organization.masterCurrency }));
@@ -130,7 +130,7 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
         invoiceId: formData.invoiceId === "none" ? null : formData.invoiceId,
         currency: formData.currency,
         exchangeRate: formData.currency === masterCurrency ? 1.0 : exchangeRate,
-        category: formData.category === "Other" ? (formData.customCategory || "Other") : formData.category,
+        category: formData.category,
       };
       
       if (expenseToEdit) {
@@ -243,126 +243,109 @@ export function RecordExpenseDialog({ open, onOpenChange, onSuccess, defaultInvo
 
           <div className="flex flex-col gap-3">
             <label className="text-sm font-semibold">Category</label>
-            <div className="flex flex-col gap-2">
-                <Select 
-                  value={formData.category} 
-                  onValueChange={val => setFormData({...formData, category: val})}
-                  items={["Software", "Contractor", "Hardware", "Travel", "Other"].map(c => ({ value: c, label: c }))}
+            <Popover open={openCategory} onOpenChange={setOpenCategory}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openCategory}
+                  className="w-full justify-between bg-transparent hover:bg-input/50 font-normal"
                 >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="Software">Software</SelectItem>
-                        <SelectItem value="Contractor">Contractor</SelectItem>
-                        <SelectItem value="Hardware">Hardware</SelectItem>
-                        <SelectItem value="Travel">Travel</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                </Select>
-                {formData.category === "Other" && (
-                    <Input 
-                        placeholder="Specify custom category..." 
-                        value={formData.customCategory} 
-                        onChange={e => setFormData({...formData, customCategory: e.target.value})}
-                        autoFocus
-                    />
-                )}
+                  {formData.category ? formData.category : "Select category..."}
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="min-w-(--radix-popover-trigger-width) p-0" align="start">
+                <Command>
+                  <CommandInput 
+                    placeholder="Search or type custom category..." 
+                    value={categorySearch}
+                    onValueChange={setCategorySearch}
+                  />
+                  <CommandList>
+                    <CommandEmpty>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-sm"
+                        onClick={() => {
+                          setFormData({ ...formData, category: categorySearch });
+                          setOpenCategory(false);
+                          setCategorySearch("");
+                        }}
+                      >
+                        Create "{categorySearch}"
+                      </Button>
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {Array.from(new Set(dbCategories)).map((cat) => (
+                        <CommandItem
+                          key={cat}
+                          value={cat}
+                          onSelect={() => {
+                            setFormData({ ...formData, category: cat });
+                            setOpenCategory(false);
+                            setCategorySearch("");
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2",
+                              formData.category === cat ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {cat}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-semibold">Link to Project (Optional)</label>
+              {formData.projectId !== "none" && (
+                <button type="button" onClick={() => setFormData({...formData, projectId: "none", invoiceId: "none"})} className="text-xs text-muted-foreground hover:text-foreground">
+                  Clear
+                </button>
+              )}
             </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-semibold">Link to Client (Optional)</label>
-            <Select 
-              value={formData.clientId} 
-              onValueChange={val => setFormData({...formData, clientId: val, projectId: "none", invoiceId: "none"})}
-              items={[
-                { value: "none", label: "None" },
-                ...clients.map(c => ({ value: c.id, label: c.name }))
-              ]}
-            >
-                <SelectTrigger>
-                    <SelectValue placeholder="Select Client">
-                        {formData.clientId !== "none" 
-                            ? (clients.find(c => c.id === formData.clientId)?.name || expenseToEdit?.client?.name || formData.clientId) 
-                            : "Select Client"}
-                    </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {clients.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-semibold">Link to Project (Optional)</label>
             <Select 
               value={formData.projectId} 
-              onValueChange={val => setFormData({...formData, projectId: val, invoiceId: "none"})}
-              disabled={formData.clientId === "none"}
+              onValueChange={val => {
+                const selectedProject = projects.find(p => p.id === val);
+                if (selectedProject) {
+                  setFormData({
+                    ...formData, 
+                    projectId: val, 
+                    clientId: selectedProject.clientId || formData.clientId, 
+                    invoiceId: "none"
+                  });
+                }
+              }}
               items={[
-                { value: "none", label: "None" },
                 ...projects
-                  .filter(proj => proj.clientId === formData.clientId)
+                  .filter(proj => formData.clientId === "none" || proj.clientId === formData.clientId)
                   .map(proj => ({ value: proj.id, label: proj.title }))
               ]}
             >
                 <SelectTrigger>
-                    <SelectValue placeholder={formData.clientId === "none" ? "Select a client first" : "Select Project"}>
+                    <SelectValue placeholder="Select Project">
                         {formData.projectId !== "none" 
                             ? (projects.find(p => p.id === formData.projectId)?.title || expenseToEdit?.project?.title || formData.projectId) 
-                            : (formData.clientId === "none" ? "Select a client first" : "Select Project")}
+                            : "Select Project"}
                     </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {projects
-                      .filter(proj => proj.clientId === formData.clientId)
-                      .map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
+
+                    {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
                 </SelectContent>
             </Select>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-semibold">Link to Invoice (Optional)</label>
-            <Select 
-              value={formData.invoiceId} 
-              onValueChange={val => {
-                if (val === "none") {
-                  setFormData({...formData, invoiceId: val});
-                  return;
-                }
-                const selectedInvoice = invoices.find(inv => inv.id === val);
-                if (selectedInvoice) {
-                  setFormData({
-                    ...formData, 
-                    invoiceId: val, 
-                    clientId: selectedInvoice.clientId || formData.clientId,
-                    projectId: selectedInvoice.projectId || formData.projectId
-                  });
-                } else {
-                  setFormData({...formData, invoiceId: val});
-                }
-              }}
-              disabled={formData.clientId === "none" && invoices.length === 0}
-            >
-                <SelectTrigger>
-                    <SelectValue placeholder={formData.clientId !== "none" ? "Select Invoice" : "Select Client first (or any invoice)"}>
-                        {formData.invoiceId !== "none" 
-                            ? (invoices.find(i => i.id === formData.invoiceId)?.invoiceNumber || expenseToEdit?.invoice?.invoiceNumber || formData.invoiceId) 
-                            : (formData.clientId !== "none" ? "Select Invoice" : "Select Client first (or any invoice)")}
-                    </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {invoices
-                      .filter(i => formData.clientId === "none" || i.clientId === formData.clientId)
-                      .filter(i => formData.projectId === "none" || i.projectId === formData.projectId || !i.projectId)
-                      .map(i => <SelectItem key={i.id} value={i.id}>{i.invoiceNumber}</SelectItem>)}
-                </SelectContent>
-            </Select>
-          </div>
 
           <SheetFooter className="mt-4 pt-4 border-t px-0 mx-0 pb-2">
             <SheetClose render={<Button type="button" variant="outline" disabled={isSubmitting}>Cancel</Button>} />

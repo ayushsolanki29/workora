@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { ReceiptIcon, PlusIcon, Edit, Trash2, EyeIcon } from "lucide-react";
+import { ReceiptIcon, PlusIcon, Edit, Trash2, EyeIcon, TrendingDown, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import API from "@/lib/api";
@@ -26,6 +26,11 @@ export default function ExpensesPage() {
   const searchParams = useSearchParams();
   const { organization } = useOrganization();
   const [expenses, setExpenses] = useState([]);
+  const [summary, setSummary] = useState({
+    totalExpenses: 0,
+    thisMonthExpenses: 0,
+    topCategory: "-"
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isRecordExpenseOpen, setIsRecordExpenseOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
@@ -35,6 +40,9 @@ export default function ExpensesPage() {
     try {
       const res = await API.get("/expenses");
       setExpenses(res.data.expenses || []);
+      if (res.data.summary) {
+        setSummary(res.data.summary);
+      }
     } catch (error) {
       toast.error("Failed to load expenses");
     } finally {
@@ -85,6 +93,30 @@ export default function ExpensesPage() {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="border rounded-xl bg-card p-6 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-2 text-muted-foreground mb-2">
+            <TrendingDown className="size-4" />
+            <p className="text-sm font-medium">Total Expenses</p>
+          </div>
+          <p className="text-3xl font-bold">{formatCurrency(summary.totalExpenses, organization?.masterCurrency || "USD")}</p>
+        </div>
+        <div className="border rounded-xl bg-card p-6 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-2 text-muted-foreground mb-2">
+            <Calendar className="size-4" />
+            <p className="text-sm font-medium">This Month</p>
+          </div>
+          <p className="text-3xl font-bold">{formatCurrency(summary.thisMonthExpenses, organization?.masterCurrency || "USD")}</p>
+        </div>
+        <div className="border rounded-xl bg-card p-6 flex flex-col gap-1 shadow-sm">
+          <div className="flex items-center gap-2 text-muted-foreground mb-2">
+            <Tag className="size-4" />
+            <p className="text-sm font-medium">Top Category</p>
+          </div>
+          <p className="text-3xl font-bold truncate" title={summary.topCategory}>{summary.topCategory}</p>
+        </div>
+      </div>
+
       <div className="border rounded-xl bg-card overflow-hidden">
         <Table>
           <TableHeader>
@@ -92,8 +124,7 @@ export default function ExpensesPage() {
               <TableHead>Date</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Category</TableHead>
-              <TableHead>Linked Client</TableHead>
-              <TableHead>Linked Invoice</TableHead>
+              <TableHead>Linked To</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead className="w-[100px]"></TableHead>
             </TableRow>
@@ -124,18 +155,20 @@ export default function ExpensesPage() {
                     {expense.category}
                   </TableCell>
                   <TableCell>
-                    {expense.client ? (
-                      <Link href={`/dashboard/clients/${expense.clientId}`} className="flex items-center gap-3 hover:underline">
-                        <DynamicAvatar type="client" seed={expense.client.name} size={28} />
-                        {expense.client.name}
-                      </Link>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>
                     {expense.invoice ? (
                       <Link href={`/dashboard/invoices/${expense.invoiceId}`} className="flex items-center gap-3 hover:underline">
                         <DynamicAvatar type="invoice" seed={expense.invoice.invoiceNumber} size={28} />
                         {expense.invoice.invoiceNumber}
+                      </Link>
+                    ) : expense.project ? (
+                      <div className="flex items-center gap-3">
+                        <DynamicAvatar type="project" seed={expense.project.title} size={28} />
+                        {expense.project.title}
+                      </div>
+                    ) : expense.client ? (
+                      <Link href={`/dashboard/clients/${expense.clientId}`} className="flex items-center gap-3 hover:underline">
+                        <DynamicAvatar type="client" seed={expense.client.name} size={28} />
+                        {expense.client.name}
                       </Link>
                     ) : '-'}
                   </TableCell>
