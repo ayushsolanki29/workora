@@ -76,7 +76,7 @@ function ClientLocalTime({ timezone, country }) {
   if (!timezone) {
     return (
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger>
           <div className="flex items-center gap-1.5 cursor-help w-max">
             <InfoIcon className="size-4 text-muted-foreground" />
             <span className="text-muted-foreground">N/A</span>
@@ -93,7 +93,7 @@ function ClientLocalTime({ timezone, country }) {
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
+      <TooltipTrigger>
         <div className="flex items-center gap-1.5 cursor-help w-max">
           <InfoIcon className="size-4 text-muted-foreground" />
           <span>{time}</span>

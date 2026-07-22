@@ -62,7 +62,15 @@ export default function MigrationPage() {
       try {
         const json = JSON.parse(event.target.result);
         setParsedData(json);
-        toast.success("Data parsed successfully!");
+        
+        const knownKeys = ['clients', 'projects', 'invoices', 'payments', 'expenses'];
+        const unknownKeys = Object.keys(json).filter(key => !knownKeys.includes(key));
+        
+        if (unknownKeys.length > 0) {
+          toast.warning(`Unknown data found: ${unknownKeys.join(', ')}. These will be ignored, but we will proceed with the known data.`, { duration: 6000 });
+        } else {
+          toast.success("Data parsed successfully!");
+        }
       } catch (error) {
         toast.error("Failed to parse JSON file. Ensure it is valid.");
         console.error(error);
