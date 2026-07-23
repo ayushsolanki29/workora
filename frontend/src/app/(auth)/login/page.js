@@ -32,7 +32,7 @@ export default function LoginPage() {
         setErrors({ email: "Please enter a valid email address." });
         return;
       }
-      
+
       setIsLoading(true);
       try {
         const res = await API.post("/auth/check-email", { email: cleanEmail });
@@ -43,22 +43,22 @@ export default function LoginPage() {
           }
         } else {
           if (res.data.inWaitlist) {
-            setErrors({ 
+            setErrors({
               email: (
                 <span>
                   Your request is still on the waitlist.{" "}
                   <Link href={`/status?email=${encodeURIComponent(cleanEmail)}`} className="underline hover:text-red-700 font-semibold">Check status here.</Link>
                 </span>
-              ) 
+              )
             });
           } else {
-            setErrors({ 
+            setErrors({
               email: (
                 <span>
                   Account not found. Want to join the waiting list?{" "}
                   <Link href="/request-access" className="underline hover:text-red-700 font-semibold">Request access here.</Link>
                 </span>
-              ) 
+              )
             });
           }
         }
@@ -74,7 +74,7 @@ export default function LoginPage() {
         setErrors({ password: "Password is required." });
         return;
       }
-      
+
       setIsLoading(true);
       try {
         const res = await API.post("/auth/login", { email, password, termsAccepted });
@@ -98,7 +98,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 relative bg-slate-900 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 z-10" />
         <img
-          src="/login-banner.jpeg"
+          src="https://res.cloudinary.com/wo3jj3yk/image/upload/v1784809991/login-banner_qpsjcz.jpg"
           alt="Soseki Background"
           className="absolute inset-0 w-full h-full object-cover opacity-90"
         />
@@ -139,15 +139,15 @@ export default function LoginPage() {
               <label className="text-sm font-medium text-foreground" htmlFor="email">
                 Email
               </label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="name@company.com" 
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@company.com"
                 className={cn(
                   "h-10 shadow-none bg-transparent rounded-md transition-colors",
                   errors.email && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500"
                 )}
-                required 
+                required
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -158,7 +158,7 @@ export default function LoginPage() {
               />
               {errors.email && <p className="text-sm text-red-500 font-medium animate-in fade-in slide-in-from-top-1">{errors.email}</p>}
             </div>
-            
+
             {step === "password" && (
               <>
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -171,15 +171,15 @@ export default function LoginPage() {
                     </Link>
                   </div>
                   <div className="relative">
-                    <Input 
-                      id="password" 
-                      type={showPassword ? "text" : "password"} 
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
                       className={cn(
                         "h-10 shadow-none bg-transparent rounded-md transition-colors pr-10",
                         errors.password && "border-red-500 focus-visible:ring-red-500/20 focus-visible:border-red-500"
                       )}
-                      required 
-                      autoFocus 
+                      required
+                      autoFocus
                       value={password}
                       onChange={(e) => {
                         setPassword(e.target.value);
@@ -187,8 +187,8 @@ export default function LoginPage() {
                       }}
                       disabled={isLoading}
                     />
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-0 focus:outline-none"
                     >
@@ -199,11 +199,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex items-start gap-2 pt-1 animate-in fade-in duration-300">
-                  <input 
-                    type="checkbox" 
-                    id="terms" 
-                    className="mt-0.5 size-4 rounded-sm border-input bg-transparent accent-primary shrink-0 cursor-pointer" 
-                    required 
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    className="mt-0.5 size-4 rounded-sm border-input bg-transparent accent-primary shrink-0 cursor-pointer"
+                    required
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
                   />

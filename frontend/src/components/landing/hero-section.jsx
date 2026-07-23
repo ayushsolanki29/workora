@@ -41,7 +41,7 @@ export function HeroSection() {
       {/* Dashboard Mockup exactly matching the layout style */}
       <div className="mt-16 sm:mt-24 w-full max-w-[1100px] relative sm:px-6 flex justify-start">
         <Image 
-          src="/dashboard.png" 
+          src="https://res.cloudinary.com/wo3jj3yk/image/upload/v1784809992/dashboard_vntblc.png" 
           alt="Soseki Dashboard Preview" 
           width={1100} 
           height={700} 

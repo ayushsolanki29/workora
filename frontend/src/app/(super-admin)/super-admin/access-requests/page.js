@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/table";
 import { DynamicAvatar } from "@/components/ui/dynamic-avatar";
 import { formatDate } from "@/lib/utils";
-
-
-
+import { Button } from "@/components/ui/button";
+import { AddUserModal } from "@/components/add-user-modal";
 export default function SuperAdminAccessRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +57,7 @@ export default function SuperAdminAccessRequestsPage() {
                <TableHead>Earnings</TableHead>
                <TableHead>Previous Tool</TableHead>
                <TableHead>Requested On</TableHead>
+               <TableHead className="text-right">Actions</TableHead>
              </TableRow>
            </TableHeader>
            <TableBody>
@@ -84,6 +84,17 @@ export default function SuperAdminAccessRequestsPage() {
                    <TableCell>{req.earningsRange || "-"}</TableCell>
                    <TableCell>{req.previousTool || "-"}</TableCell>
                    <TableCell>{formatDate(req.createdAt)}</TableCell>
+                   <TableCell className="text-right">
+                     <AddUserModal 
+                       defaultName={req.fullName || ""}
+                       defaultEmail={req.email || ""}
+                       trigger={
+                         <Button variant="outline" size="sm">
+                           Create User
+                         </Button>
+                       }
+                     />
+                   </TableCell>
                  </TableRow>
                ))
              )}

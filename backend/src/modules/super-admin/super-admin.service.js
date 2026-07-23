@@ -516,8 +516,16 @@ class SuperAdminService {
       },
     });
 
+    const superAdmins = await prisma.superUser.findMany({
+      select: { email: true }
+    });
+    const superAdminEmails = superAdmins.map(admin => admin.email);
+
     const orphanUsers = await prisma.user.findMany({
-      where: { organizationId: null },
+      where: { 
+        organizationId: null,
+        email: { notIn: superAdminEmails }
+      },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

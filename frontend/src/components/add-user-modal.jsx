@@ -15,12 +15,12 @@ import { toast } from "sonner";
 import API from "@/lib/api";
 import { PlusIcon } from "lucide-react";
 
-export function AddUserModal({ trigger }) {
+export function AddUserModal({ trigger, defaultName = "", defaultEmail = "" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: ""
+    name: defaultName,
+    email: defaultEmail
   });
   const [generatedPassword, setGeneratedPassword] = useState("");
 
@@ -48,7 +48,13 @@ export function AddUserModal({ trigger }) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       setIsOpen(open);
-      if (!open) setGeneratedPassword("");
+      if (!open) {
+        setGeneratedPassword("");
+        // Reset form when closed, preserving default props if they were passed
+        setFormData({ name: defaultName, email: defaultEmail });
+      } else {
+        setFormData({ name: defaultName, email: defaultEmail });
+      }
     }}>
       <DialogTrigger render={
         trigger || (

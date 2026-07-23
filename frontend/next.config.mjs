@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'storage.efferd.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
 };
