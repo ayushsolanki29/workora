@@ -66,6 +66,7 @@ export function CookieConsent() {
       <div className="bg-white dark:bg-[#09090b] border border-gray-200 dark:border-white/10 shadow-2xl rounded-2xl p-5 max-w-sm w-full pointer-events-auto flex flex-col gap-4 relative animate-in slide-in-from-bottom-5 fade-in duration-500">
         <button 
           onClick={handleDecline}
+          aria-label="Close cookie consent"
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
         >
           <X className="w-4 h-4" />

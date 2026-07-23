@@ -102,13 +102,13 @@ export default function PricingPage() {
                   <div className="bg-slate-100 p-1 rounded-lg flex items-center shadow-inner">
                     <button 
                       onClick={() => setCurrency("usd")}
-                      className={cn("px-3 py-1 rounded-md text-[11px] font-bold transition-all", currency === "usd" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                      className={cn("px-3 py-1 rounded-md text-[11px] font-bold transition-all", currency === "usd" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-700")}
                     >
                       USD ($)
                     </button>
                     <button 
                       onClick={() => setCurrency("inr")}
-                      className={cn("px-3 py-1 rounded-md text-[11px] font-bold transition-all", currency === "inr" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                      className={cn("px-3 py-1 rounded-md text-[11px] font-bold transition-all", currency === "inr" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-700")}
                     >
                       INR (₹)
                     </button>

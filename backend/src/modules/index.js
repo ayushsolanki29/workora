@@ -38,7 +38,7 @@ router.use('/questionnaires', questionnairesRoutes);
 router.use('/quick-items', quickItemsRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/super-admin', superAdminRoutes);
-router.use('/tracking', trackingRoutes);
+router.use('/t', trackingRoutes);
 router.use('/migration', migrationRoutes);
 router.use('/portal', portalRoutes);
 router.use('/public', publicRoutes);

@@ -29,10 +29,10 @@ export function GlobalBillingSection() {
                       </div>
                       <div className="flex flex-col text-left">
                         <span className="text-[13px] font-semibold text-slate-800">Berlin Agency</span>
-                        <span className="text-[10px] text-slate-500">Invoice #1042</span>
+                        <span className="text-[10px] text-slate-600">Invoice #1042</span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded-md border border-blue-100 shadow-sm">Paid • €4,200</span>
+                    <span className="text-[11px] font-bold bg-blue-50 text-blue-700 px-2 py-1 rounded-md border border-blue-100 shadow-sm">Paid • €4,200</span>
                   </div>
                   <div className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl shadow-sm bg-white hover:border-emerald-200 transition-colors duration-300">
                     <div className="flex items-center gap-3">
@@ -42,28 +42,28 @@ export function GlobalBillingSection() {
                       </div>
                       <div className="flex flex-col text-left">
                         <span className="text-[13px] font-semibold text-slate-800">London Tech</span>
-                        <span className="text-[10px] text-slate-500">Invoice #1043</span>
+                        <span className="text-[10px] text-slate-600">Invoice #1043</span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md border border-emerald-100 shadow-sm">Paid • £2,850</span>
+                    <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md border border-emerald-100 shadow-sm">Paid • £2,850</span>
                   </div>
                   <div className="flex items-center justify-between p-3.5 border border-slate-200 rounded-xl border-dashed bg-slate-50/50 hover:bg-slate-50 transition-colors duration-300">
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <img src="https://api.dicebear.com/9.x/shapes/svg?seed=NYConsulting" alt="Avatar" className="w-8 h-8 rounded-full grayscale opacity-50" />
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-200 text-slate-500 border border-white flex items-center justify-center text-[8px] font-bold">$</div>
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-slate-200 text-slate-600 border border-white flex items-center justify-center text-[8px] font-bold">$</div>
                       </div>
                       <div className="flex flex-col text-left">
-                        <span className="text-[13px] font-medium text-slate-500">NY Consulting</span>
-                        <span className="text-[10px] text-slate-400">Draft</span>
+                        <span className="text-[13px] font-medium text-slate-600">NY Consulting</span>
+                        <span className="text-[10px] text-slate-600">Draft</span>
                       </div>
                     </div>
-                    <span className="text-[11px] font-medium text-slate-400">Draft • $1,500</span>
+                    <span className="text-[11px] font-medium text-slate-600">Draft • $1,500</span>
                   </div>
                 </div>
               </div>
               <div className="text-center max-w-xs">
-                <div className="text-[11px] font-bold tracking-wider uppercase text-blue-600 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
+                <div className="text-[11px] font-bold tracking-wider uppercase text-blue-700 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
                   <Globe className="w-4 h-4" /> MULTI-CURRENCY INVOICING
                 </div>
                 <p className="text-[14px] text-slate-600 leading-relaxed font-medium">
@@ -85,10 +85,10 @@ export function GlobalBillingSection() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Exchange Snapshot</span>
+                      <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Live Exchange Snapshot</span>
                     </div>
                     <span className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
-                      <span className="text-slate-400 text-lg">$1</span> <ArrowRight className="w-4 h-4 text-slate-300" /> 149.32 ¥
+                      <span className="text-slate-600 text-lg">$1</span> <ArrowRight className="w-4 h-4 text-slate-500" /> 149.32 ¥
                     </span>
                   </div>
                   <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-2.5 shadow-sm group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
@@ -98,7 +98,7 @@ export function GlobalBillingSection() {
                 
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 relative z-10 shadow-inner group-hover:border-emerald-100 transition-colors duration-300">
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-[12px] font-semibold text-slate-500">Base Currency (USD)</span>
+                    <span className="text-[12px] font-semibold text-slate-700">Base Currency (USD)</span>
                     <span className="text-base font-bold text-slate-900">$12,450.00</span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-2 mb-2 overflow-hidden">
@@ -106,12 +106,12 @@ export function GlobalBillingSection() {
                        <div className="absolute inset-0 bg-white/20 w-full animate-pulse" style={{ backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)' }}></div>
                     </div>
                   </div>
-                  <p className="text-[10px] font-medium text-slate-400 text-right">Converted accurately on payment date</p>
+                  <p className="text-[10px] font-medium text-slate-600 text-right">Converted accurately on payment date</p>
                 </div>
               </div>
               
               <div className="text-center max-w-xs">
-                <div className="text-[11px] font-bold tracking-wider uppercase text-emerald-600 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
+                <div className="text-[11px] font-bold tracking-wider uppercase text-emerald-700 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
                   <BarChart3 className="w-4 h-4" /> ACCURATE REPORTING
                 </div>
                 <p className="text-[14px] text-slate-600 leading-relaxed font-medium">

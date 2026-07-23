@@ -31,7 +31,7 @@ export function ClientIntakeSection() {
                   <div className="p-1.5 bg-blue-50 text-blue-600 rounded-md"><Sparkles className="w-4 h-4" /></div>
                   <span className="text-xs font-bold text-slate-700">AI Form Builder</span>
                 </div>
-                <div className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-full font-medium">Generating...</div>
+                <div className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium">Generating...</div>
               </div>
 
               <div className="flex flex-col gap-2 relative z-10 flex-1">
@@ -52,7 +52,7 @@ export function ClientIntakeSection() {
             </div>
 
             <div className="text-center max-w-xs">
-              <div className="text-[11px] font-bold tracking-wider uppercase text-emerald-600 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
+              <div className="text-[11px] font-bold tracking-wider uppercase text-emerald-700 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
                 <Sparkles className="w-4 h-4" /> AI-ASSISTED CREATION
               </div>
               <p className="text-[14px] text-slate-600 leading-relaxed font-medium">
@@ -70,23 +70,24 @@ export function ClientIntakeSection() {
                 <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
                   <FileText className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-800 mb-1">New Client Intake</h4>
-                <p className="text-[11px] text-slate-500 mb-6">Public questionnaire ready to share</p>
+                <h3 className="text-sm font-bold text-slate-800 mb-1">New Client Intake</h3>
+                <p className="text-[11px] text-slate-600 mb-6">Public questionnaire ready to share</p>
 
                 <div className="w-full flex items-center justify-between bg-slate-50 border border-slate-200 rounded-lg p-1.5 pl-3 group-hover:border-blue-200 group-hover:bg-blue-50/30 transition-colors duration-300">
                   <div className="flex items-center gap-2 overflow-hidden">
-                    <Link2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                    <span className="text-[11px] text-slate-500 truncate w-32">soseki.app/form/abc12</span>
+                    <Link2 className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                    <span className="text-[11px] text-slate-600 truncate w-32">soseki.app/form/abc12</span>
                   </div>
-                  <button className="bg-white border border-slate-200 text-slate-600 p-1.5 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 group-hover:shadow-[0_0_15px_rgba(37,99,235,0.4)]">
+                  <button aria-label="Copy link" title="Copy link" className="bg-white border border-slate-200 text-slate-600 p-1.5 rounded-md hover:bg-slate-100 hover:text-slate-900 transition-colors group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 group-hover:shadow-[0_0_15px_rgba(37,99,235,0.4)]">
                     <Copy className="w-3.5 h-3.5" />
+                    <span className="sr-only">Copy link</span>
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="text-center max-w-xs">
-              <div className="text-[11px] font-bold tracking-wider uppercase text-blue-600 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
+              <div className="text-[11px] font-bold tracking-wider uppercase text-blue-700 mb-2.5 flex items-center justify-center gap-1.5 group-hover:scale-105 transition-transform duration-300">
                 <Link2 className="w-4 h-4" /> SHAREABLE PUBLIC LINKS
               </div>
               <p className="text-[14px] text-slate-600 leading-relaxed font-medium">

@@ -33,7 +33,7 @@ export function HeroSection() {
           </Link>
         </div>
 
-        <p className="text-[13px] text-slate-400 font-medium">
+        <p className="text-[13px] text-slate-600 font-medium">
           For freelancers, consultants, and small agencies.
         </p>
       </div>

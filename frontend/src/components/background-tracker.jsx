@@ -44,7 +44,7 @@ export function BackgroundTracker() {
         };
 
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-        const endpoint = `${apiUrl}/tracking/visit`;
+        const endpoint = `${apiUrl}/t/v`;
 
         // navigator.sendBeacon is perfectly non-blocking and ideal for analytics
         if (navigator.sendBeacon) {

@@ -29,8 +29,11 @@ export function Footer() {
                                 key={`social-${item.link}-${index}`}
                                 size="icon"
                                 variant="outline"
-                                render={<a href={item.link} target="_blank" />}
-                                nativeButton={false}>{item.icon}</Button>
+                                render={<a href={item.link} target="_blank" aria-label={item.label} title={item.label} />}
+                                nativeButton={false}>
+                                {item.icon}
+                                <span className="sr-only">{item.label}</span>
+                            </Button>
 						))}
 					</div>
 				</div>
@@ -109,13 +112,16 @@ const socialLinks = [
 	{
 		icon: <GithubIcon />,
 		link: "https://github.com/ayushsolanki29/soseki-app",
+		label: "GitHub Repository",
 	},
 	{
 		icon: <InstagramIcon />,
 		link: "https://instagram.com",
+		label: "Instagram Page",
 	},
 	{
 		icon: <XIcon />,
 		link: "https://x.com/sosekiapp",
+		label: "X (Twitter) Profile",
 	},
 ];
