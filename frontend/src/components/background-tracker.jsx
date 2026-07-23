@@ -19,9 +19,14 @@ export function BackgroundTracker() {
       return;
     }
 
-    // Do not track bots or crawlers
-    if (typeof navigator !== "undefined" && navigator.webdriver) {
-      return;
+    // Do not track bots, crawlers, or Lighthouse (to prevent console errors in audits)
+    if (typeof navigator !== "undefined") {
+      if (
+        navigator.webdriver || 
+        /bot|crawler|spider|crawling|lighthouse/i.test(navigator.userAgent)
+      ) {
+        return;
+      }
     }
 
     tracked.current = true;

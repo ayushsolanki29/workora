@@ -40,15 +40,15 @@ export function PricingSection() {
                         <div className="mt-8 bg-slate-100 p-1 rounded-lg inline-flex items-center shadow-inner self-start">
                             <button 
                                 onClick={() => setCurrency("usd")}
-                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2", currency === "usd" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2", currency === "usd" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-700")}
                             >
-                                <img src="https://flagcdn.com/w20/us.png" width="16" alt="US Flag" className="rounded-[2px]" /> USD ($)
+                                <img src="https://flagcdn.com/w20/us.png" width="16" height="12" alt="US Flag" className="rounded-[2px]" /> USD ($)
                             </button>
                             <button 
                                 onClick={() => setCurrency("inr")}
-                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2", currency === "inr" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700")}
+                                className={cn("px-4 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-2", currency === "inr" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-700")}
                             >
-                                <img src="https://flagcdn.com/w20/in.png" width="16" alt="India Flag" className="rounded-[2px]" /> INR (₹)
+                                <img src="https://flagcdn.com/w20/in.png" width="16" height="11" alt="India Flag" className="rounded-[2px]" /> INR (₹)
                             </button>
                         </div>
 					</div>

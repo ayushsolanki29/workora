@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import { Suspense } from "react";
 import { BackgroundTracker } from "@/components/background-tracker";
 import { CookieConsent } from "@/components/cookie-consent";
-import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -105,8 +104,24 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
-        <GoogleTagManager gtmId="GTM-KS9248KF" />
-        <GoogleAnalytics gaId="G-X1600G8S2W" />
+        <Script id="google-tag-manager" strategy="lazyOnload">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KS9248KF');
+          `}
+        </Script>
+        <Script strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-X1600G8S2W" />
+        <Script id="google-analytics" strategy="lazyOnload">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-X1600G8S2W');
+          `}
+        </Script>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster richColors position="bottom-right" />
         <Suspense fallback={null}>
