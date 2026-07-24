@@ -26,16 +26,29 @@ export function TrustedBySection() {
 
           {/* Example 2: Nick Launches */}
           <a href="https://nicklaunches.com/products/soseki/?utm_source=soseki.app&utm_medium=badge&utm_campaign=featured" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform flex items-center justify-center">
-            <img src="https://nicklaunches.com/badges/featured.png" alt="Soseki on Nick Launches" width="244" height="56" className="h-[56px] w-auto shadow-sm rounded-full" />
+            <img src="https://nicklaunches.com/badges/featured.png" alt="Soseki on Nick Launches" width="244" height="56" className="h-[56px] w-auto" />
+          </a>
+          {/* Example 3: Uneed */}
+          <a href="https://www.uneed.best/tool/soseki" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform flex items-center justify-center">
+            <img src="https://www.uneed.best/EMBED3B.png" alt="Launching Soon on Uneed" className="h-[56px] w-auto" />
+          </a>
+          {/* Example 4: Dodo Payments */}
+          <a href="https://index.dodopayments.com/soseki" target="_blank" rel="noopener noreferrer" aria-label="Featured on Dodo Payments badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', padding: '10px 20px', borderRadius: '9999px', border: '1px solid #E5E7EB', background: '#FFFFFF', fontFamily: "'Google Sans Flex',Arial,sans-serif", textDecoration: 'none', height: '56px' }} className="hover:scale-105 transition-transform shadow-sm">
+            <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', borderRadius: '9999px', background: '#F8FAFC', border: '1px solid #E5E7EB' }}>
+              <span className="text-lg leading-none" role="img" aria-label="Dodo">🦤</span>
+            </span>
+            <span style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }} className="text-left">
+              <span style={{ fontSize: '11px', letterSpacing: '2px', textTransform: 'uppercase', color: '#0F172A' }}>FEATURED ON</span>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#0F172A' }}>Dodo Payments</span>
+            </span>
           </a>
 
-          {/* Example 3: Aback Launch */}
-          <a href="https://abacklaunch.com" target="_blank" rel="dofollow" className="hover:scale-105 transition-transform flex items-center justify-center bg-white rounded-full p-2 border border-[#E5E7EB] shadow-sm h-[56px]">
-            <img src="https://abacklaunch.com/badges/listed-on-light.svg" alt="Listed on Aback Launch" width="150" height="32" className="h-full w-auto p-1" />
+          {/* Example 5: Aura++ */}
+          <a href="https://auraplusplus.com/projects/soseki-open-source-freelance-business-platform" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform flex items-center justify-center">
+            <img src="https://auraplusplus.com/images/badges/featured-on-light.svg" alt="Featured on Aura++" width="265" height="58" className="h-[56px] w-auto" />
           </a>
 
-          {/* You can add the rest of your 12 badges here! Just paste them below like the ones above. */}
-
+          {/* You can add the rest of your badges here! Just paste them below like the ones above. */}
         </div>
       </div>
     </section>
